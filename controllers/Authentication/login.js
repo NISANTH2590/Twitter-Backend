@@ -5,7 +5,6 @@ var bcrypt = require("bcrypt");
 const twilio = require("twilio");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
-const querystring = require("querystring");
 const SERVER_ROOT_URI = "http://localhost:8080";
 const { forgetotp } = require("../../utils/helpers/otp_generator");
 const {
