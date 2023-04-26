@@ -25,8 +25,8 @@ const credentials = {
 
 const client = new Client(credentials);
 client.connect((err) => {
-  if (err) console.log(err);
-  else console.log("Connected to Database");
+  // if (err) (err);
+  // else console.log("Connected to Database");
 });
 
 module.exports = client;

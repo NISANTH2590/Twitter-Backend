@@ -39,7 +39,7 @@ app.use(
 
 app.listen(port, (err) => {
   if (err) throw err;
-  else console.log("Running at port 8080");
+  // else console.log("Running at port 8080");
 });
 
 // io.on("connection", (socket) => {

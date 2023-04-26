@@ -145,7 +145,7 @@ try {
               const token = jwt.sign({ user_id: User_id }, JWT_SECRET_KEY, {
                 expiresIn: "7d",
               });
-              console.log(token);
+              // console.log(token);
               database.query(
                 "update UserAccount set token = $1 where id = $2",
                 [token, User_id],
