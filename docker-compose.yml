@@ -1,0 +1,51 @@
+# version: "3.7"
+# services:
+#   app:
+#     build: .
+#     depends_on:
+#       - postgres
+#     ports:
+#       - "8080:8080"
+
+#   postgres:
+#     image: postgres
+#     ports:
+#       - "5431:5432"
+#     environment:
+#       POSTGRES_PASSWORD: 1234
+#     volumes:
+#       - /path/to/local/directory:/var/lib/postgresql/data
+
+version: "3.9"
+services:
+  app:
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    image: nisanth2590/twitter-dockerfile
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: twitter
+      DB_USERNAME: postgres
+      DB_PASSWORD: 1234
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    command: npm start
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: twitter
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+volumes:
+  db_data:
