@@ -35,22 +35,24 @@ const addretweet = (req, res) => {
       "select * from retweet where user_id = $1 AND tweet_id = $2",
       [req.user.user_id, tweet],
       async (err, results) => {
-        if (err) throw err;
-        if (results.rows.length) {
-          res.status(400).json({ Message: "retweets Already added" });
-        } else {
-          database.query(
-            "Insert into retweet (user_id,tweet_id) values ($1,$2)",
-            [req.user.user_id, tweet],
-            (err, results) => {
-              if (err) res.status(400).json(err);
-              else {
-                if (results) res.status(200).json("Retweet inserted");
-                else res.status(200).json("Tweet not inserted");
+        if (err) res.status(400).json(err);
+        else {
+          if (results.rows.length) {
+            res.status(400).json({ Message: "retweets Already added" });
+          } else {
+            database.query(
+              "Insert into retweet (user_id,tweet_id) values ($1,$2)",
+              [req.user.user_id, tweet],
+              (err, results) => {
+                if (err) res.status(400).json(err);
+                else {
+                  if (results) res.status(200).json("Retweet inserted");
+                  else res.status(200).json("Tweet not inserted");
+                }
               }
-            }
-          );
-          await updateretweets(tweet);
+            );
+            await updateretweets(tweet);
+          }
         }
       }
     );
