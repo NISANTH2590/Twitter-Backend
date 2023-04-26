@@ -3,10 +3,10 @@ const database = require("../../db.config");
 const followcount = async (req, res) => {
   try {
     Promise.all([
-      database.query("select followingid from follow where followersid = $1", [
+      database.query("select followingid from follow where followerid = $1", [
         req.user.user_id,
       ]),
-      database.query("select followersid from follow where followingid = $1", [
+      database.query("select followerid from follow where followingid = $1", [
         req.user.user_id,
       ]),
     ]).then(

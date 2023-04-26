@@ -15,7 +15,7 @@ try {
       query = "SELECT username FROM UserAccount WHERE username = $1";
       // type = "username";
     } else {
-      res.status(400).json({ message: "Invalid input." });
+      res.status(200).json({ message: "Invalid input." });
       return;
     }
 
@@ -31,6 +31,7 @@ try {
     });
   };
 } catch (err) {
+  // res.status(200).json("Invalid credentials");
   res.status(400).json(err);
 }
 

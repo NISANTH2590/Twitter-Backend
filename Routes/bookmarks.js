@@ -15,7 +15,7 @@ const {
 
 router.get("/bookmarks", authenticateToken, limiter, bookmarks);
 router.post("/addbookmark", authenticateToken, addbookmark);
-router.post("/deletebookmark", authenticateToken, removebookmark);
-router.get("/deleteallbookmarks", authenticateToken, deleteallbookmarks);
+router.delete("/deletebookmark", authenticateToken, removebookmark);
+router.delete("/deleteallbookmarks", authenticateToken, deleteallbookmarks);
 
 module.exports = router;

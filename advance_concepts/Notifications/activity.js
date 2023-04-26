@@ -12,10 +12,14 @@ const database = require("../../db.config");
 // };
 
 const mentionedactivities = async (req, res) => {
+  try{
   database.query(
     "select followerid from follow where followingid = $1;",
     [req.user.user_id],
     (err, results) => {
+      if(err)
+      res.status(400).json(err);
+      else
       res.status(200).json(results.rows);
     }
   );

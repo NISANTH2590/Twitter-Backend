@@ -11,11 +11,11 @@ const {
   viewanalytics,
 } = require("../controllers/TweetAnalytics/Analytics");
 
-router.post("/impressions", authenticateToken, impressions);
-router.post("/engagements", authenticateToken, Engagements);
-router.post("/detail_expands", authenticateToken, Detail_expands);
-router.post("/new_followers", authenticateToken, New_followers);
-router.post("/profile_visits", authenticateToken, Profile_visits);
-router.post("/viewanalytics", authenticateToken, viewanalytics);
+router.patch("/impressions", authenticateToken, impressions);
+router.patch("/engagements", authenticateToken, Engagements);
+router.patch("/detail_expands", authenticateToken, Detail_expands);
+router.patch("/new_followers", authenticateToken, New_followers);
+router.patch("/profile_visits", authenticateToken, Profile_visits);
+router.patch("/viewanalytics", authenticateToken, viewanalytics);
 
 module.exports = router;

@@ -39,7 +39,7 @@ const twittercircle = (req, res) => {
       (err, results) => {
         if (err) res.status(400).json(err);
 
-        if (results) console.log(results.rows);
+        if (results) res.status(200).json(results.rows);
       }
     );
   } catch (err) {

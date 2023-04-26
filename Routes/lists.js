@@ -13,6 +13,6 @@ router.post("/createlist", authenticateToken, createlist);
 router.post("/user_lists", authenticateToken, user_lists);
 router.post("/addtweet", authenticateToken, addtweet);
 router.post("/addlist", authenticateToken, addlist);
-router.post("/deletelist", authenticateToken, deletelist);
+router.delete("/deletelist", authenticateToken, deletelist);
 
 module.exports = router;

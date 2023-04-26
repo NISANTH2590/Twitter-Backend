@@ -13,9 +13,9 @@ const {
 
 router.post("/uploadprofilepic", authenticateToken, upload);
 router.get("/profile", authenticateToken, profile);
-router.get("/removeprofilepic", authenticateToken, remove_profile_pic);
-router.get("/removeheaderpic", authenticateToken, remove_header_pic);
-router.get("/removedob", authenticateToken, remove_dob);
-router.get("/updateprofile", authenticateToken, update_profile_content);
+router.patch("/removeprofilepic", authenticateToken, remove_profile_pic);
+router.patch("/removeheaderpic", authenticateToken, remove_header_pic);
+router.patch("/removedob", authenticateToken, remove_dob);
+router.patch("/updateprofile", authenticateToken, update_profile_content);
 
 module.exports = router;

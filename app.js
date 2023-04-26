@@ -14,15 +14,16 @@ const bookmarks = require("./Routes/bookmarks");
 const tweets = require("./Routes/tweets");
 const misc = require("./Routes/misc");
 const trending = require("./Routes/trending");
+const follow = require("./Routes/follow");
 const bodyParser = require("body-parser");
-app.use(cors());
+const twittercircle = require("./Routes/twittercircle");
+
 app.use(
+  cors(),
+  bodyParser.json(),
   bodyParser.urlencoded({
     extended: false,
-  })
-);
-app.use(bodyParser.json());
-app.use(
+  }),
   auth,
   analytics,
   messages,
@@ -31,7 +32,9 @@ app.use(
   bookmarks,
   tweets,
   misc,
-  trending
+  trending,
+  follow,
+  twittercircle
 );
 
 app.listen(port, (err) => {
