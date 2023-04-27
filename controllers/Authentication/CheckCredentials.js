@@ -1,7 +1,7 @@
 const database = require("../../db.config");
 
 try {
-  var usercredentials = (req, res) => {
+  var UserCredentials = (req, res) => {
     var user = req.body.user;
     // console.log(user);
     let query = "";
@@ -36,7 +36,7 @@ try {
 }
 
 try {
-  var checkemail = (req, res) => {
+  var CheckEmail = (req, res) => {
     let email = req.body.email_id;
     // console.log(email);
     if (email) {
@@ -62,7 +62,7 @@ try {
 }
 
 try {
-  var checkphone = (req, res) => {
+  var CheckPhone = (req, res) => {
     let phone = req.body.phone_number;
     // console.log(phone);
     if (phone) {
@@ -85,7 +85,7 @@ try {
 }
 
 try {
-  var checkusername = (req, res) => {
+  var CheckUsername = (req, res) => {
     let userName = req.body.username;
     // console.log(userName);
     if (userName) {
@@ -110,4 +110,4 @@ try {
   res.status(400).json(err);
 }
 
-module.exports = { checkemail, checkphone, checkusername, usercredentials };
+module.exports = { CheckEmail, CheckPhone, CheckUsername, UserCredentials };

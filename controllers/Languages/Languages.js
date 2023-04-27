@@ -1,6 +1,6 @@
 const database = require("../../db.config");
 
-const displaylanguages = (req, res) => {
+const DisplayLanguages = (req, res) => {
   try {
     database.query("select * from languages", (err, results, fields) => {
       if (err) res.status(400).json(err);
@@ -11,7 +11,7 @@ const displaylanguages = (req, res) => {
   }
 };
 
-const registerlanguages = async (req, res) => {
+const RegisterLanguages = async (req, res) => {
   const user_languages = req.body.user_languages;
   const user_categories = req.body.user_categories;
   // for (let i = 0; i < user_languages.length || user_categories.length; i++) {
@@ -42,8 +42,8 @@ const registerlanguages = async (req, res) => {
         [req.user.user_id, user_languages[i]],
         async (err, results) => {
           if (err) res.status(400).json(err);
-          if (results)
-            await res.status(200).json({ message: "User languages Inserted" });
+          // if (results)
+          // await res.status(200).json({ message: "User languages Inserted" });
         }
       );
       for (let i = 0; i < user_categories.length; i++) {
@@ -63,7 +63,7 @@ const registerlanguages = async (req, res) => {
   }
 };
 
-const userlanguages = (req, res) => {
+const UserLanguages = (req, res) => {
   try {
     database.query(
       "select languages from user_languages where id = $1",
@@ -80,4 +80,4 @@ const userlanguages = (req, res) => {
   }
 };
 
-module.exports = { displaylanguages, registerlanguages, userlanguages };
+module.exports = { DisplayLanguages, RegisterLanguages, UserLanguages };

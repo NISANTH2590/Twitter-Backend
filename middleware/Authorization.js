@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const { JWT_SECRET_KEY } = process.env;
 
 try {
-  var authenticateToken = (req, res, next) => {
+  var AuthenticateToken = (req, res, next) => {
     // console.log(req.headers.authorization);
 
     let token = req.headers.authorization?.split(" ")[1];
@@ -26,4 +26,4 @@ try {
   res.status(400).json(err);
 }
 
-module.exports = { authenticateToken };
+module.exports = { AuthenticateToken };

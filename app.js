@@ -6,17 +6,17 @@ require("dotenv").config();
 const { PORT } = process.env;
 const port = 8080 || PORT;
 const auth = require("./Routes/Auth");
-const analytics = require("./Routes/tweetanalytics");
-const messages = require("./Routes/messages");
-const list = require("./Routes/lists");
-const profile = require("./Routes/profile");
-const bookmarks = require("./Routes/bookmarks");
-const tweets = require("./Routes/tweets");
-const misc = require("./Routes/misc");
-const trending = require("./Routes/trending");
-const follow = require("./Routes/follow");
+const analytics = require("./Routes/TweetAnalytics");
+const messages = require("./Routes/Messages");
+const list = require("./Routes/Lists");
+const profile = require("./Routes/Profile");
+const bookmarks = require("./Routes/BookMarks");
+const tweets = require("./Routes/Tweets");
+const misc = require("./Routes/Misc");
+const trending = require("./Routes/Trending");
+const follow = require("./Routes/Follow");
 const bodyParser = require("body-parser");
-const twittercircle = require("./Routes/twittercircle");
+const twittercircle = require("./Routes/TwitterCircle");
 
 app.use(
   cors(),

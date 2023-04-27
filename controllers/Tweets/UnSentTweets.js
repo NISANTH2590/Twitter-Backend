@@ -2,8 +2,6 @@ const database = require("../../db.config");
 const schedule = require("node-schedule");
 
 schedule.scheduleJob("* * * * *", () => {
-  // console.log("hi nish");
-  // const tweet = req.body.tweetid;
   try {
     database.query(
       "select schedule,tweetid,replyid from unsenttweets where schedule is not null",

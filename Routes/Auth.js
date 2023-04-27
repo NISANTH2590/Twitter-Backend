@@ -7,61 +7,61 @@ const {
   username,
   insertusername,
   notification_permission,
-} = require("../controllers/Authentication/signup");
+} = require("../controllers/Authentication/Signup");
 
 const {
-  usercredentials,
-  checkemail,
-  checkphone,
-  checkusername,
-} = require("../controllers/Authentication/checkcredentials");
+  UserCredentials,
+  CheckEmail,
+  CheckPhone,
+  CheckUsername,
+} = require("../controllers/Authentication/CheckCredentials");
 
 const {
-  googlelogin,
-  userpassword,
-  loginotp,
-  verifyloginotp,
-  updatepassword,
-  pass_reset_status,
-  pass_reset_opinion,
-} = require("../controllers/Authentication/login");
+  GoogleLogin,
+  UserPassword,
+  LoginOtp,
+  // verifyLoginOtp,
+  UpdatePassword,
+  PassResetStatus,
+  PassResetOpinion,
+} = require("../controllers/Authentication/Login");
 
-const { authenticateToken } = require("../middleware/authorization");
+const { AuthenticateToken } = require("../middleware/Authorization");
 
 const {
-  displaylanguages,
-  registerlanguages,
-  userlanguages,
-} = require("../controllers/Languages/languages");
+  DisplayLanguages,
+  RegisterLanguages,
+  UserLanguages,
+} = require("../controllers/Languages/Languages");
 
-router.post("/checkphone", checkphone);
-router.post("/checkemail", checkemail);
+router.post("/CheckPhone", CheckPhone);
+router.post("/CheckEmail", CheckEmail);
 router.post("/otp", otpAuth);
 router.post("/verifyotp", verifyotp);
-router.post("/password", authenticateToken, password);
-// router.post("/updateprofilepic", authenticateToken, update_profile_pic);
-router.get("/username", authenticateToken, username);
-router.post("/checkusername", authenticateToken, checkusername);
+router.post("/password", AuthenticateToken, password);
+// router.post("/updateprofilepic", AuthenticateToken, update_profile_pic);
+router.get("/username", AuthenticateToken, username);
+router.post("/CheckUsername", AuthenticateToken, CheckUsername);
 router.post(
   "/notification_permission",
-  authenticateToken,
+  AuthenticateToken,
   notification_permission
 );
-router.post("/insertusername", authenticateToken, insertusername);
+router.post("/insertusername", AuthenticateToken, insertusername);
 
-router.get("/displaylanguages", authenticateToken, displaylanguages);
-router.get("/userlanguages", authenticateToken, userlanguages);
-router.post("/registerlanguages", authenticateToken, registerlanguages);
+router.get("/displaylanguages", AuthenticateToken, DisplayLanguages);
+router.get("/userlanguages", AuthenticateToken, UserLanguages);
+router.post("/registerlanguages", AuthenticateToken, RegisterLanguages);
 
-router.post("/usercredentials", usercredentials);
-router.post("/login", userpassword);
-router.get("/googlelogin", googlelogin);
-router.post("/passresetstatus", pass_reset_status);
+router.post("/usercredentials", UserCredentials);
+router.post("/login", UserPassword);
+router.get("/GoogleLogin", GoogleLogin);
+router.post("/passresetstatus", PassResetStatus);
 // router.post("/loginotp", loginotp);
 // router.post("/verifyloginotp", verifyloginotp);
-router.post("/updatepassword", updatepassword);
-router.post("/passwordresetopinion", pass_reset_opinion);
-// router.get("/homepage", authenticateToken, welcomepage);
+router.post("/updatepassword", UpdatePassword);
+router.post("/passwordresetopinion", PassResetOpinion);
+// router.get("/homepage", AuthenticateToken, welcomepage);
 // router.post("/welcomepage", welcomepage);
 // router.post("/loginpage", loginpage);
 

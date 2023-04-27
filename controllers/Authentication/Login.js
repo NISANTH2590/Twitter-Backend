@@ -43,12 +43,9 @@ const client = new twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 // }
 
 try {
-  var googlelogin = (req, res) => {
+  var GoogleLogin = (req, res) => {
     const accesstoken = req.body.accesstoken;
     const email = req.body.email;
-    // accesstoken = jwt.sign({ user_id: User_id }, JWT_SECRET_KEY, {
-    //   expiresIn: "5d",
-    // });
     database.query(
       "insert into UserAccount(email,token) values ($1,$2)",
       [email, accesstoken],
@@ -66,7 +63,7 @@ try {
 }
 
 try {
-  var userpassword = async (req, res) => {
+  var UserPassword = async (req, res) => {
     var password = req.body.password;
     var phone = req.body.phonenumber;
     var email = req.body.email;
@@ -144,7 +141,6 @@ try {
               const token = jwt.sign({ user_id: User_id }, JWT_SECRET_KEY, {
                 expiresIn: "7d",
               });
-              // console.log(token);
               database.query(
                 "update UserAccount set token = $1 where id = $2",
                 [token, User_id],
@@ -166,7 +162,7 @@ try {
 }
 
 try {
-  var pass_reset_status = (req, res) => {
+  var PassResetStatus = (req, res) => {
     var status = req.body.status;
     var phone = req.body.phonenumber;
     var email = req.body.email;
@@ -174,7 +170,7 @@ try {
       database.query(
         "update UserAccount set pass_reset_status = 'true'  where phonenumber = $1;",
         [phone],
-        async (err, results, fields) => {
+        async (err, results) => {
           if (err) res.status(400).json(err);
           res.status(200).json("success");
         }
@@ -183,7 +179,7 @@ try {
       database.query(
         "update UserAccount set pass_reset_status = 'true'  where email = $1;",
         [email],
-        async (err, results, fields) => {
+        async (err, results) => {
           if (err) res.status(400).json(err);
           res.status(200).json("success");
         }
@@ -195,7 +191,7 @@ try {
 }
 
 try {
-  var loginotp = (req, res) => {
+  var LoginOtp = (req, res) => {
     var phone = req.body.phonenumber;
     var email = req.body.email;
     if (phone) {
@@ -253,7 +249,7 @@ try {
 }
 
 try {
-  var verifyloginotp = (req, res) => {
+  var VerifyLoginOtp = (req, res) => {
     if (req.body.otp == forgetotp) {
       res.status(200).json("OTP verified");
     } else res.status(200).json("Invalid OTP");
@@ -263,7 +259,7 @@ try {
 }
 
 try {
-  var updatepassword = async (req, res) => {
+  var UpdatePassword = async (req, res) => {
     var phone = req.body.phone;
     var email = req.body.email;
     var username = req.body.username;
@@ -307,7 +303,7 @@ try {
 }
 
 try {
-  var pass_reset_opinion = (req, res) => {
+  var PassResetOpinion = (req, res) => {
     var pass_reset_opinion = req.body.opinion;
     var username = req.body.username;
     var phone = req.body.phone;
@@ -350,11 +346,11 @@ try {
 }
 
 module.exports = {
-  googlelogin,
-  userpassword,
-  loginotp,
-  verifyloginotp,
-  updatepassword,
-  pass_reset_status,
-  pass_reset_opinion,
+  GoogleLogin,
+  UserPassword,
+  LoginOtp,
+  VerifyLoginOtp,
+  UpdatePassword,
+  PassResetStatus,
+  PassResetOpinion,
 };

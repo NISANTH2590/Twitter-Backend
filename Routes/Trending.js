@@ -1,6 +1,6 @@
 let express = require("express");
 const router = express.Router();
-const { authenticateToken } = require("../middleware/authorization");
+const { AuthenticateToken } = require("../middleware/Authorization");
 
 const {
   trendinghashtags,
@@ -8,23 +8,23 @@ const {
   trendinghashtags_entertainment,
   trendinghashtags_sports,
   trendinghashtags_news,
-} = require("../controllers/What's_Happening/trending");
+} = require("../controllers/WhatsHappeningSection/Trending");
 
-router.post("/trendinghashtags", authenticateToken, trendinghashtags);
+router.post("/trendinghashtags", AuthenticateToken, trendinghashtags);
 // router.post(
 //   "/trendinghashtags_music",
-//   authenticateToken,
+//   AuthenticateToken,
 //   trendinghashtags_music
 // );
 router.post(
   "/trendinghashtags_entertainment",
-  authenticateToken,
+  AuthenticateToken,
   trendinghashtags_entertainment
 );
 router.post(
   "/trendinghashtags_sports",
-  authenticateToken,
+  AuthenticateToken,
   trendinghashtags_sports
 );
-router.post("/trendinghashtags_news", authenticateToken, trendinghashtags_news);
+router.post("/trendinghashtags_news", AuthenticateToken, trendinghashtags_news);
 module.exports = router;
