@@ -1,7 +1,7 @@
 const database = require("../../db.config");
 
-try {
-  var UserCredentials = (req, res) => {
+var UserCredentials = (req, res) => {
+  try {
     var user = req.body.user;
     // console.log(user);
     let query = "";
@@ -29,14 +29,14 @@ try {
         res.status(200).json(result.fields[0].name);
       }
     });
-  };
-} catch (err) {
-  // res.status(200).json("Invalid credentials");
-  res.status(400).json(err);
-}
+  } catch (err) {
+    // res.status(200).json("Invalid credentials");
+    res.status(400).json(err);
+  }
+};
 
-try {
-  var CheckEmail = (req, res) => {
+var CheckEmail = (req, res) => {
+  try {
     let email = req.body.email_id;
     // console.log(email);
     if (email) {
@@ -56,13 +56,13 @@ try {
         }
       );
     }
-  };
-} catch (err) {
-  res.status(400).json(err);
-}
+  } catch (err) {
+    res.status(400).json(err);
+  }
+};
 
-try {
-  var CheckPhone = (req, res) => {
+var CheckPhone = (req, res) => {
+  try {
     let phone = req.body.phone_number;
     // console.log(phone);
     if (phone) {
@@ -79,13 +79,13 @@ try {
         }
       );
     }
-  };
-} catch (err) {
-  res.status(400).json(err);
-}
+  } catch (err) {
+    res.status(400).json(err);
+  }
+};
 
-try {
-  var CheckUsername = (req, res) => {
+var CheckUsername = (req, res) => {
+  try {
     let userName = req.body.username;
     // console.log(userName);
     if (userName) {
@@ -105,9 +105,9 @@ try {
         }
       );
     }
-  };
-} catch (err) {
-  res.status(400).json(err);
-}
+  } catch (err) {
+    res.status(400).json(err);
+  }
+};
 
 module.exports = { CheckEmail, CheckPhone, CheckUsername, UserCredentials };
