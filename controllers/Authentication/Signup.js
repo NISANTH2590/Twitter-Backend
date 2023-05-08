@@ -37,8 +37,8 @@ try {
           to: "+91" + phone,
           from: "+18572801915",
         })
-        .then((message) => res.status(200).json(otp))
-        .catch((err) => res.status(400).json(err));
+        .then((message) => res.status(200).json({ status: true, data: otp }))
+        .catch((err) => res.status(400).json({ status: false, message: err }));
     } else if (email) {
       // console.log("hi");
       let mailTransporter = nodemailer.createTransport({
@@ -58,15 +58,15 @@ try {
 
       mailTransporter.sendMail(mailDetails, function (err, data) {
         if (err) {
-          res.status(400).json(err);
+          res.status(400).json({ status: false, message: err });
         } else {
-          res.status(200).json(otp);
+          res.status(200).json({ status: true, data: otp });
         }
       });
     }
   };
 } catch (err) {
-  res.status(400).json(err);
+  res.status(400).json({ status: false, message: err });
 }
 
 try {
@@ -86,7 +86,7 @@ try {
         "insert into UserAccount(name,email,birthdate,phonenumber,experience,createdat) values ($1,$2,$3,$4,$5,NOW())",
         [name, email, birthdate, phone, exp],
         (err, results) => {
-          if (err) res.status(400).json(err);
+          if (err) res.status(400).json({ status: false, message: err });
         }
       );
       if (email) {
@@ -108,8 +108,9 @@ try {
                 "update UserAccount set token =$1 where email = $2",
                 [token, email],
                 (err, results) => {
-                  if (err) res.status(400).json(err);
-                  else res.status(200).json(token);
+                  if (err)
+                    res.status(400).json({ status: false, message: err });
+                  else res.status(200).json({ status: true, data: token });
                 }
               );
             }
@@ -135,18 +136,19 @@ try {
                 "update UserAccount set token =$1 where phonenumber = $2",
                 [token, phone],
                 (err, results) => {
-                  if (err) res.status(400).json(err);
-                  else res.status(200).json(token);
+                  if (err)
+                    res.status(400).json({ status: false, message: err });
+                  else res.status(200).json({ status: true, data: token });
                 }
               );
             }
           }
         );
       }
-    } else res.status(200).json("Invalid OTP");
+    } else res.status(200).json({ status: false, message: "Invalid OTP" });
   };
 } catch (err) {
-  res.status(400).json(err);
+  res.status(400).json({ status: false, message: err });
 }
 
 try {
@@ -159,15 +161,15 @@ try {
       "update UserAccount set password=$1 where id = $2",
       [pass, req.user.user_id],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
-          res.status(200).json("Password Inserted");
+          res.status(200).json({ status: true, message: "Password Inserted" });
         }
       }
     );
   };
 } catch (err) {
-  res.status(400).json(err);
+  res.status(400).json({ status: false, message: err });
 }
 
 try {
@@ -177,14 +179,14 @@ try {
       "select name from UserAccount where id = $1",
       [req.user.user_id],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         if (results.rows.length) name = results.rows[0].name;
-        res.status(200).json(name + usernameotp);
+        res.status(200).json({ status: true, data: name + usernameotp });
       }
     );
   };
 } catch (err) {
-  res.status(400).json(err);
+  res.status(400).json({ status: false, message: err });
 }
 
 try {
@@ -196,14 +198,14 @@ try {
         "update UserAccount set username=$1 where id = $2",
         [username, req.user.user_id],
         (err, results) => {
-          if (err) res.status(400).json(err);
-          res.status(200).json("user name inserted");
+          if (err) res.status(400).json({ status: false, message: err });
+          res.status(200).json({ status: true, message: "user name inserted" });
         }
       );
     }
   };
 } catch (err) {
-  res.status(400).json(err);
+  res.status(400).json({ status: false, message: err });
 }
 
 try {
@@ -213,13 +215,15 @@ try {
       "update UserAccount set notification_permission=$1 where id = $2",
       [notification, req.user.user_id],
       (err, results) => {
-        if (err) res.status(400).json(err);
-        res.status(200).json("notification inserted");
+        if (err) res.status(400).json({ status: false, message: err });
+        res
+          .status(200)
+          .json({ status: true, message: "notification inserted" });
       }
     );
   };
 } catch (err) {
-  res.status(400).json(err);
+  res.status(400).json({ status: false, message: err });
 }
 
 module.exports = {

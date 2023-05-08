@@ -8,12 +8,13 @@ const unfollow = async (req, res) => {
       "delete from follow where followingid=$1 AND followersid = $2",
       [user, req.user.user_id],
       (err, results) => {
-        if (err) res.status(400).json(err);
-        if (results) res.status(200).json("Follower Removed");
+        if (err) res.status(400).json({ status: false, message: err });
+        if (results)
+          res.status(200).json({ status: true, message: "Follower Removed" });
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 

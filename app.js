@@ -1,5 +1,10 @@
 let express = require("express");
 let app = express();
+const ratelimit = require("express-rate-limit");
+const limiter = ratelimit({
+  max: 2,
+  windowMs: 10000,
+});
 // const io = require("socket.io")(3000);
 let cors = require("cors");
 require("dotenv").config();
@@ -19,6 +24,7 @@ const bodyParser = require("body-parser");
 const twittercircle = require("./Routes/TwitterCircle");
 
 app.use(
+  limiter,
   cors(),
   bodyParser.json(),
   bodyParser.urlencoded({

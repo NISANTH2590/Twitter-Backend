@@ -15,7 +15,7 @@ var UserCredentials = (req, res) => {
       query = "SELECT username FROM UserAccount WHERE username = $1";
       // type = "username";
     } else {
-      res.status(200).json({ message: "Invalid input." });
+      res.status(200).json({ status: false, message: "Invalid input." });
       return;
     }
 
@@ -23,15 +23,14 @@ var UserCredentials = (req, res) => {
       if (err) {
         res.status(500).json({ message: "Database error." });
       } else if (result.rows.length === 0) {
-        res.status(200).json("Invalid credentials");
+        res.status(400).json({ status: false, message: "Invalid credentials" });
       } else {
-        // console.log();
-        res.status(200).json(result.fields[0].name);
+        res.status(200).json({ status: true, data: result.fields[0].name });
       }
     });
   } catch (err) {
     // res.status(200).json("Invalid credentials");
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -45,19 +44,21 @@ var CheckEmail = (req, res) => {
         [email],
         (err, results, fields) => {
           if (err) {
-            res.status(400).json(err);
+            res.status(400).json({ status: false, message: err });
           } else {
             if (results.rows.length > 0) {
-              res.status(200).json("Email is Already Taken");
+              res
+                .status(200)
+                .json({ status: false, message: "Email is Already Taken" });
             } else {
-              res.status(200).json("Success");
+              res.status(200).json({ status: true, message: "Success" });
             }
           }
         }
       );
     }
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -70,17 +71,20 @@ var CheckPhone = (req, res) => {
         "select * from UserAccount where phonenumber = $1",
         [phone],
         (err, results) => {
-          if (err) res.status(400).json(err);
+          if (err) res.status(400).json({ status: false, message: err });
           else if (results.rows.length > 0) {
-            res.status(200).json("Phone Number is Already Taken");
+            res.status(200).json({
+              status: false,
+              message: "Phone Number is Already Taken",
+            });
           } else {
-            res.status(200).json("Success");
+            res.status(200).json({ status: true, message: "Success" });
           }
         }
       );
     }
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -93,20 +97,22 @@ var CheckUsername = (req, res) => {
         "select username from UserAccount where username = $1",
         [userName],
         (err, results, fields) => {
-          if (err) res.status(400).json(err);
+          if (err) res.status(400).json({ status: false, message: err });
           else {
             if (results.rows.length > 0) {
-              res.status(200).json("username is Already Taken");
+              res
+                .status(200)
+                .json({ status: false, message: "username is Already Taken" });
             } else {
               // console.log("n");
-              res.status(200).json("success");
+              res.status(200).json({ status: true, message: "Success" });
             }
           }
         }
       );
     }
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 

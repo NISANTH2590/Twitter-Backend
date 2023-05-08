@@ -35,7 +35,7 @@ const search =
   async (req, res) => {
     try {
       // const term = req.body.searchterm;
-      const value = req.body.value;
+      // const value = req.body.value;
       const tweetid = req.body.tweetid;
       const response = await elasticClient
         .search({
@@ -51,7 +51,7 @@ const search =
           },
         })
         .then((resp) => {
-          res.status(200).json(resp.hits.hits);
+          res.status(200).json({ status: true, data: resp.hits.hits });
           // return res.status(200).json({
         });
       // The response variable now contains the search results
@@ -71,7 +71,7 @@ const search =
       //       err,
       //     });
     } catch (err) {
-      res.status(400).json(err);
+      res.status(400).json({ status: false, message: err });
     }
   });
 
@@ -117,10 +117,10 @@ const post =
           body: body,
         })
         .then((resp) => {
-          res.status(200).json(resp);
+          res.status(200).json({ status: true, data: resp });
         });
     } catch (err) {
-      res.status(400).json(err);
+      res.status(400).json({ status: false, message: err });
     }
   });
 

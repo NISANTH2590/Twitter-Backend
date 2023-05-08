@@ -15,7 +15,7 @@ const {
   deleteallbookmarks,
 } = require("../controllers/BookMarks/Bookmarks");
 
-router.get("/bookmarks", AuthenticateToken, limiter, bookmarks);
+router.get("/bookmarks", AuthenticateToken, bookmarks);
 router.post("/addbookmark", AuthenticateToken, addbookmark);
 router.delete("/deletebookmark", AuthenticateToken, removebookmark);
 router.delete("/deleteallbookmarks", AuthenticateToken, deleteallbookmarks);

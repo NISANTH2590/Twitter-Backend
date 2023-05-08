@@ -16,7 +16,7 @@ const addnotinterested = (req, res) => {
             "insert into notinterested (userid,topic) values ($1,$2))",
             [req.user.user_id, topic],
             (err, results) => {
-              if (err) res.status(400).json(err);
+              if (err) res.status(400).json({ status: false, message: err });
               else {
                 if (results)
                   res
@@ -33,7 +33,7 @@ const addnotinterested = (req, res) => {
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -44,16 +44,20 @@ const removenotinterested = (req, res) => {
       "delete from notinterested where topic = $1 and userid = $2",
       [topic, req.user.user_id],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
           if (results)
-            res.status(200).json("topic removed from notinterested.");
-          else res.status(200).json("not_interested topics are not removed");
+            res
+              .status(200)
+              .json({
+                status: true,
+                message: "topic removed from notinterested.",
+              });
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 

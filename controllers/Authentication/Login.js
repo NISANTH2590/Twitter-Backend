@@ -42,28 +42,28 @@ const client = new twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 //   return `${rootUrl}?${querystring.stringify(options)}`;
 // }
 
-try {
-  var GoogleLogin = (req, res) => {
+var GoogleLogin = (req, res) => {
+  try {
     const accesstoken = req.body.accesstoken;
     const email = req.body.email;
     database.query(
       "insert into UserAccount(email,token) values ($1,$2)",
       [email, accesstoken],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
           res.status(200).json({ message: "user inserted" });
         }
       }
     );
     // return res.send(getGoogleAuthURL());
-  };
-} catch (err) {
-  res.status(400).json(err);
-}
+  } catch (err) {
+    res.status(400).json({ status: false, message: err });
+  }
+};
 
-try {
-  var UserPassword = async (req, res) => {
+var UserPassword = async (req, res) => {
+  try {
     var password = req.body.password;
     var phone = req.body.phonenumber;
     var email = req.body.email;
@@ -88,12 +88,15 @@ try {
                 "update UserAccount set token = $1 where id = $2",
                 [token, User_id],
                 async (err, results, fields) => {
-                  if (err) res.status(400).json(err);
+                  if (err)
+                    res.status(400).json({ status: false, message: err });
                   res.status(200).json({ message: "Logged In" });
                 }
               );
             } else {
-              res.status(200).json("Wrong Password!");
+              res
+                .status(200)
+                .json({ status: false, message: "Wrong Password!" });
             }
           }
         }
@@ -117,12 +120,15 @@ try {
                 "update UserAccount set token = $1 where id = $2",
                 [token, User_id],
                 async (err, results, fields) => {
-                  if (err) res.status(400).json(err);
+                  if (err)
+                    res.status(400).json({ status: false, message: err });
                   res.status(200).json({ message: "Logged In" });
                 }
               );
             } else {
-              res.status(200).json("Wrong Password!");
+              res
+                .status(200)
+                .json({ status: false, message: "Wrong Password!" });
             }
           }
         }
@@ -145,24 +151,27 @@ try {
                 "update UserAccount set token = $1 where id = $2",
                 [token, User_id],
                 async (err, results, fields) => {
-                  if (err) res.status(400).json(err);
+                  if (err)
+                    res.status(400).json({ status: false, message: err });
                   res.status(200).json({ message: "Logged In" });
                 }
               );
             } else {
-              res.status(200).json("Wrong Password!");
+              res
+                .status(200)
+                .json({ status: false, message: "Wrong Password!" });
             }
           }
         }
       );
     }
-  };
-} catch (err) {
-  res.status(400).json(err);
-}
+  } catch (err) {
+    res.status(400).json({ status: false, message: err });
+  }
+};
 
-try {
-  var PassResetStatus = (req, res) => {
+var PassResetStatus = (req, res) => {
+  try {
     var status = req.body.status;
     var phone = req.body.phonenumber;
     var email = req.body.email;
@@ -171,27 +180,28 @@ try {
         "update UserAccount set pass_reset_status = 'true'  where phonenumber = $1;",
         [phone],
         async (err, results) => {
-          if (err) res.status(400).json(err);
-          res.status(200).json("success");
+          if (err) res.status(400).json({ status: false, message: err });
+          res.status(200).json({ status: true, message: "Success" });
         }
       );
     } else if (status && email) {
       database.query(
         "update UserAccount set pass_reset_status = 'true'  where email = $1;",
         [email],
+
         async (err, results) => {
-          if (err) res.status(400).json(err);
-          res.status(200).json("success");
+          if (err) res.status(400).json({ status: false, message: err });
+          res.status(200).json({ status: true, message: "Success" });
         }
       );
     }
-  };
-} catch (err) {
-  res.status(400).json(err);
-}
+  } catch (err) {
+    res.status(400).json({ status: false, message: err });
+  }
+};
 
-try {
-  var LoginOtp = (req, res) => {
+var LoginOtp = (req, res) => {
+  try {
     var phone = req.body.phonenumber;
     var email = req.body.email;
     if (phone) {
@@ -209,7 +219,7 @@ try {
         [email],
         (err, results, fields) => {
           if (results.rows.length > 0) {
-            if (err) res.status(400).json(err);
+            if (err) res.status(400).json({ status: false, message: err });
             else {
               username = results.rows[0].username;
             }
@@ -237,29 +247,31 @@ try {
 
       mailTransporter.sendMail(mailDetails, function (err, data) {
         if (err) {
-          res.status(400).json(err);
+          res.status(400).json({ status: false, message: err });
         } else {
-          res.status(200).json("Email sent successfully");
+          res
+            .status(200)
+            .json({ status: true, message: "Email sent successfully" });
         }
       });
     }
-  };
-} catch (err) {
-  res.status(400).json(err);
-}
+  } catch (err) {
+    res.status(400).json({ status: false, message: err });
+  }
+};
 
-try {
-  var VerifyLoginOtp = (req, res) => {
+var VerifyLoginOtp = (req, res) => {
+  try {
     if (req.body.otp == forgetotp) {
-      res.status(200).json("OTP verified");
-    } else res.status(200).json("Invalid OTP");
-  };
-} catch (err) {
-  res.status(400).json(err);
-}
+      res.status(200).json({ status: true, message: "OTP verified" });
+    } else res.status(400).json({ status: false, message: "Invalid OTP" });
+  } catch (err) {
+    res.status(400).json({ status: false, message: err });
+  }
+};
 
-try {
-  var UpdatePassword = async (req, res) => {
+var UpdatePassword = async (req, res) => {
+  try {
     var phone = req.body.phone;
     var email = req.body.email;
     var username = req.body.username;
@@ -271,8 +283,8 @@ try {
         "UPDATE UserAccount SET password=$1 WHERE phonenumber=$2",
         [newpassword, phone],
         async (err, results, fields) => {
-          if (err) res.status(400).json(err);
-          res.status(200).json("Password Changed");
+          if (err) res.status(400).json({ status: false, message: err });
+          res.status(200).json({ status: true, message: "Password Changed" });
           res.end();
         }
       );
@@ -281,8 +293,8 @@ try {
         "UPDATE UserAccount SET password=$1 WHERE email=$2",
         [newpassword, email],
         async (err, results, fields) => {
-          if (err) res.status(400).json(err);
-          res.status(200).json("Password Changed");
+          if (err) res.status(400).json({ status: false, message: err });
+          res.status(200).json({ status: true, message: "Password Changed" });
           res.end();
         }
       );
@@ -291,19 +303,19 @@ try {
         "UPDATE UserAccount SET password=$1 WHERE username=$2",
         [newpassword, username],
         async (err, results, fields) => {
-          if (err) res.status(400).json(err);
-          res.status(200).json("Password Changed");
+          if (err) res.status(400).json({ status: false, message: err });
+          res.status(200).json({ status: true, message: "Password Changed" });
           res.end();
         }
       );
     }
-  };
-} catch (err) {
-  res.status(400).json(err);
-}
+  } catch (err) {
+    res.status(400).json({ status: false, message: err });
+  }
+};
 
-try {
-  var PassResetOpinion = (req, res) => {
+var PassResetOpinion = (req, res) => {
+  try {
     var pass_reset_opinion = req.body.opinion;
     var username = req.body.username;
     var phone = req.body.phone;
@@ -314,8 +326,8 @@ try {
         "UPDATE UserAccount SET pass_reset_opinion=$1 WHERE phonenumber=$2",
         [pass_reset_opinion, phone],
         async (err, results, fields) => {
-          if (err) res.status(400).json(err);
-          res.status(200).json("success");
+          if (err) res.status(400).json({ status: false, message: err });
+          res.status(200).json({ status: true, message: "Success" });
           res.end();
         }
       );
@@ -324,8 +336,8 @@ try {
         "UPDATE UserAccount SET pass_reset_opinion=$1 WHERE email=$2",
         [pass_reset_opinion, email],
         async (err, results, fields) => {
-          if (err) res.status(400).json(err);
-          res.status(200).json("success");
+          if (err) res.status(400).json({ status: false, message: err });
+          res.status(200).json({ status: true, message: "Success" });
           res.end();
         }
       );
@@ -334,16 +346,16 @@ try {
         "UPDATE UserAccount SET pass_reset_opinion=$1 WHERE username=$2",
         [pass_reset_opinion, username],
         async (err, results, fields) => {
-          if (err) res.status(400).json(err);
-          res.status(200).json("success");
+          if (err) res.status(400).json({ status: false, message: err });
+          res.status(200).json({ status: true, message: "Success" });
           res.end();
         }
       );
     }
-  };
-} catch (err) {
-  res.status(400).json(err);
-}
+  } catch (err) {
+    res.status(400).json({ status: false, message: err });
+  }
+};
 
 module.exports = {
   GoogleLogin,

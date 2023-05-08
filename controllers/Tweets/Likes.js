@@ -7,15 +7,19 @@ const likedtweets = (req, res) => {
       "select name,username,tweetcontent,retweets,tweetid,choice1,choice2,choice3,choice4,polllength,replies,views,tweets.createdat,audience,replycircle,likes from UserAccount inner join tweets on UserAccount.id=tweets.userid inner join likes on tweets.userid = likes.user_id AND tweets.tweetid = likes.tweet_id where likes.user_id=$1",
       [req.user.user_id],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
-          if (results) res.status(200).json(results.rows);
-          else res.status(400).json("Tweet not inserted");
+          if (results)
+            res.status(200).json({ status: true, data: results.rows });
+          else
+            res
+              .status(200)
+              .json({ status: false, message: "Tweet not inserted" });
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -26,7 +30,7 @@ async function tweetlikes(tweet) {
       "select user_id from likes where tweet_id = $1",
       [tweet],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         if (results.rows) {
           likes = results.rows.length;
           // console.log(likes);
@@ -34,16 +38,19 @@ async function tweetlikes(tweet) {
             "update tweets set likes = $1 where tweetid = $2 ",
             [likes, tweet],
             (err, results) => {
-              if (err) res.status(400).json(err);
+              if (err) res.status(400).json({ status: false, message: err });
               // if (results.rows) console.log("Total tweet count fetched");
               // else res.status(400).json("Error in liking a tweet");
             }
           );
-        } else res.status(200).json("Error in liking a tweet");
+        } else
+          res
+            .status(200)
+            .json({ status: false, message: "Error in liking a tweet" });
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 }
 
@@ -62,10 +69,19 @@ const addlike = (req, res) => {
             "Insert into likes (user_id,tweet_id) values ($1,$2)",
             [req.user.user_id, tweet],
             (err, results) => {
-              if (err) res.status(400).json(err);
+              if (err) res.status(400).json({ status: false, message: err });
               else {
-                if (results) res.status(200).json("Tweet liked");
-                else res.status(400).json("Error in liking a tweet");
+                if (results)
+                  res
+                    .status(200)
+                    .json({ status: true, message: "Tweet liked" });
+                else
+                  res
+                    .status(200)
+                    .json({
+                      status: false,
+                      message: "Error in liking a tweet",
+                    });
               }
             }
           );
@@ -74,7 +90,7 @@ const addlike = (req, res) => {
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -86,15 +102,19 @@ const likedbyuser = (req, res) => {
       "select id,name,username from likes inner join UserAccount on user_id = UserAccount.id where tweet_id = $1",
       [tweet],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
-          if (results) res.status(200).json(results.rows);
-          else res.status(400).json("Error in liking a tweet");
+          if (results)
+            res.status(200).json({ status: true, data: results.rows });
+          else
+            res
+              .status(200)
+              .json({ status: false, message: "Error in liking a tweet" });
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -105,16 +125,20 @@ const unlike = (req, res) => {
       "delete from likes where user_id=$1 AND tweet_id=$2",
       [req.user.user_id, tweet],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
-          if (results) res.status(200).json("Tweet unliked");
-          else res.status(400).json("Error in unliking a tweet");
+          if (results)
+            res.status(200).json({ status: true, message: "Tweet unliked" });
+          else
+            res
+              .status(200)
+              .json({ status: false, message: "Error in unliking a tweet" });
         }
       }
     );
     tweetlikes(tweet);
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 

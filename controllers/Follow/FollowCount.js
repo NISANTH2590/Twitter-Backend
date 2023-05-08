@@ -12,16 +12,17 @@ const followcount = async (req, res) => {
     ]).then(
       function ([following, followers]) {
         res.status(200).json({
+          status: true,
           following: following.rows.length,
           followers: followers.rows.length,
         });
       },
       function (error) {
-        res.status(400).json(error);
+        res.status(400).json({ status: false, message: error });
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 

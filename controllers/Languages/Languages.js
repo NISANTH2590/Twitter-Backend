@@ -3,11 +3,11 @@ const database = require("../../db.config");
 const DisplayLanguages = (req, res) => {
   try {
     database.query("select * from languages", (err, results, fields) => {
-      if (err) res.status(400).json(err);
-      res.status(200).json(results.rows);
+      if (err) res.status(400).json({ status: false, message: err });
+      res.status(200).json({ status: true, data: results.rows });
     });
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -41,7 +41,7 @@ const RegisterLanguages = async (req, res) => {
         "insert into user_languages (id,languages) values($1,$2)",
         [req.user.user_id, user_languages[i]],
         async (err, results) => {
-          if (err) res.status(400).json(err);
+          if (err) res.status(400).json({ status: false, message: err });
           // if (results)
           // await res.status(200).json({ message: "User languages Inserted" });
         }
@@ -51,14 +51,16 @@ const RegisterLanguages = async (req, res) => {
           "insert into category (userid,category) values($1,$2)",
           [req.user.user_id, user_categories[i]],
           async (err, results) => {
-            if (err) res.status(400).json(err);
+            if (err) res.status(400).json({ status: false, message: err });
             if (results)
-              res.status(200).json({ message: "User categories Inserted" });
+              res
+                .status(200)
+                .json({ status: true, message: "User categories Inserted" });
           }
         );
       }
     } catch (err) {
-      res.status(400).json(err);
+      res.status(400).json({ status: false, message: err });
     }
   }
 };
@@ -69,14 +71,14 @@ const UserLanguages = (req, res) => {
       "select languages from user_languages where id = $1",
       [req.user.user_id],
       (err, results, fields) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
-          res.status(200).json(results.rows);
+          res.status(200).json({ status: true, data: results.rows });
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 

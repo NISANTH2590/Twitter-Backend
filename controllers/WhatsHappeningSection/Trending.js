@@ -12,15 +12,19 @@ const trendinghashtags = (req, res) => {
       "select hashtags,hashtagcount from hashtags order by hashtagcount DESC limit  $1 offset $2 ",
       [limit, offset],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
-          if (results) res.status(200).json(results.rows);
-          else res.status(200).json("HashTags not Displayed.");
+          if (results)
+            res.status(200).json({ status: true, data: results.rows });
+          else
+            res
+              .status(200)
+              .json({ status: false, message: "HashTags not Displayed." });
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -56,15 +60,19 @@ const trendinghashtags_entertainment = (req, res) => {
       "select hashtags,hashtagcount from hashtags where category = $1 order by hashtagcount DESC limit  $2 offset $3",
       ["entertainment", limit, offset],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
-          if (results) res.status(200).json(results.rows);
-          else res.status(200).json("HashTags not Displayed.");
+          if (results)
+            res.status(200).json({ status: true, data: results.rows });
+          else
+            res
+              .status(200)
+              .json({ status: false, message: "HashTags not Displayed." });
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -80,15 +88,19 @@ const trendinghashtags_news = (req, res) => {
       "select hashtags,hashtagcount from hashtags where category = $1 order by hashtagcount DESC limit  $2 offset $3",
       ["news", limit, offset],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
-          if (results) res.status(200).json(results.rows);
-          else res.status(200).json("HashTags not Displayed.");
+          if (results)
+            res.status(200).json({ status: true, data: results.rows });
+          else
+            res
+              .status(200)
+              .json({ status: false, message: "HashTags not Displayed." });
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -104,15 +116,19 @@ const trendinghashtags_sports = (req, res) => {
       "select hashtags,hashtagcount from hashtags where category = $1 order by hashtagcount DESC limit  $2 offset $3",
       ["sports", limit, offset],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
-          if (results) res.status(200).json(results.rows);
-          else res.status(200).json("HashTags not Displayed.");
+          if (results)
+            res.status(200).json({ status: true, data: results.rows });
+          else
+            res
+              .status(200)
+              .json({ status: false, message: "HashTags not Displayed." });
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 module.exports = {

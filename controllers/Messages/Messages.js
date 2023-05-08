@@ -12,15 +12,15 @@ const addmessage = async (req, res) => {
       "insert into messages (userid,replyuserid,messagecontent,createdat) values ($1,$2,$3,NOW())",
       [req.user.user_id, body.replyuserid, body.messagecontent],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
-          if (results) res.status(200).json("Message added");
-          else res.status(200).json("Message not added");
+          if (results)
+            res.status(200).json({ status: true, message: "Message added" });
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -65,8 +65,11 @@ const displayusermessages = async (req, res) => {
       (err, results) => {
         if (err) throw err;
         if (results.rows.length) {
-          res.status(200).json(results.rows);
-        } else res.status(400).json("No messages available");
+          res.status(200).json({ status: true, data: results.rows });
+        } else
+          res
+            .status(400)
+            .json({ status: false, message: "No messages available" });
       }
     );
   }

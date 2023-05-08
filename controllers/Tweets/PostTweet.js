@@ -6,13 +6,16 @@ const usertweets = async (req, res) => {
       "select name,username,userid,tweetcontent,retweets,replies,views,tweets.createdat,audience,replycircle,choice1,choice2,choice3,choice4,polllength,likes from UserAccount inner join tweets on UserAccount.id=tweets.userid where tweets.userid=$1",
       [req.user.user_id],
       (err, results) => {
-        if (err) res.status(400).json(err);
-        if (results) res.status(200).json(results.rows);
-        else res.status(200).json("Tweet not inserted");
+        if (err) res.status(400).json({ status: false, message: err });
+        if (results) res.status(200).json({ status: true, data: results.rows });
+        else
+          res
+            .status(200)
+            .json({ status: false, message: "Tweet not inserted" });
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -38,6 +41,71 @@ const usertweets = async (req, res) => {
 //   );
 // };
 
+// cloudinary.config({
+//   cloud_name: api_cloud,
+//   api_key: api_key,
+//   api_secret: api_secret,
+// });
+
+// const storage = multer.diskStorage({
+//   destination: "./public/uploads",
+//   filename: function (req, file, cb) {
+//     let name =
+//       file.fieldname + "_" + Date.now() + path.extname(file.originalname);
+//     cb(null, name);
+//   },
+// });
+
+// const uploadpic = multer({
+//   storage: storage,
+//   limits: { fileSize: 10000000 },
+//   fileFilter: function (req, file, cb) {
+//     checkFileType(file, cb);
+//   },
+// }).single("myImage");
+
+// function checkFileType(file, cb) {
+//   const fileTypes = /jpeg|jpg|png|mp4/;
+
+//   const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
+//   const mimeType = fileTypes.test(file.mimetype);
+//   if (mimeType && extname) {
+//     return cb(null, true);
+//   } else {
+//     cb("Error");
+//   }
+// }
+
+// const upload = (req, res) => {
+//   try {
+//     uploadpic(req, res, async (err) => {
+//       if (err) {
+//         if (err)  res.status(400).json({ status: false, message: err});
+//       } else {
+//         let url = await cloudinary.uploader.upload(req.file.path, {
+//           resource_type: "auto",
+//         });
+//         database.query(
+//           "update UserAccount set profilepicture_url=$1 where id = $2",
+//           [url.secure_url, req.user.user_id],
+//           (err, results) => {
+//             if (err)  res.status(400).json({ status: false, message: err});
+//             else if (results) {
+//               res.status(200).json("Profile Picture Updated");
+//             } else {
+//               res.status(200).json("Profile Picture Not Updated");
+//             }
+//           }
+//         );
+
+//         fs.unlinkSync(req.file.path);
+//       }
+//     });
+//   } catch (err) {
+//      res.status(400).json({ status: false, message: err});
+//   }
+// };
+
 function inserthashtag(hashtag) {
   try {
     for (let i = 0; i < hashtag.length; i++) {
@@ -46,7 +114,7 @@ function inserthashtag(hashtag) {
         [hashtag[i].slice(0, hashtag[i].length)],
         async (err, results) => {
           // console.log(hashtag[i].slice(1, hashtag[i].length));
-          if (err) res.status(400).json(err);
+          if (err) res.status(400).json({ status: false, message: err });
           if (results.rows.length) {
             database.query(
               "update hashtags set hashtagcount = hashtagcount+1 where hashtags = $1",
@@ -68,7 +136,7 @@ function inserthashtag(hashtag) {
       );
     }
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 }
 
@@ -78,11 +146,11 @@ async function analytics(tweet) {
       "Insert into tweetanalytics (tweetid,impressions,engagements,detail_expands,new_followers,profile_visits) values ($1,0,0,0,0,0)",
       [tweet],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 }
 
@@ -103,7 +171,7 @@ async function replies1(parenttweetid) {
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 }
 
@@ -131,12 +199,12 @@ function usernames(username, tweetid) {
         "Insert into mentions (tweetid,username) values ($1,$2)",
         [tweetid, username[i].slice(0, username[i].length)],
         (err, results) => {
-          if (err) res.status(400).json(err);
+          if (err) res.status(400).json({ status: false, message: err });
         }
       );
     }
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 }
 // If the user is going to mention the reply
@@ -145,7 +213,6 @@ const posttweet = async (req, res) => {
     const body = req.body;
     const tweetcontent = body.tweetcontent;
     const hashtags = tweetcontent.match(/#\w+/g);
-    // console.log(hashtags + " ");
     const username = tweetcontent.match(/@\w+/g);
     if (hashtags) inserthashtag(hashtags);
     const tweetid = body.replytweetid;
@@ -189,13 +256,25 @@ const posttweet = async (req, res) => {
                     listid,
                   ],
                   (err, results) => {
-                    if (err) res.status(400).json(err);
+                    if (err)
+                      res.status(400).json({ status: false, message: err });
                     else {
                       if (results.rows) {
                         if (username)
                           usernames(username, results.rows[0].tweetid);
-                        res.status(200).json("Your Tweet was sent.");
-                      } else res.status(200).json("Tweet not inserted");
+                        res
+                          .status(200)
+                          .json({
+                            status: true,
+                            message: "Your Tweet was sent.",
+                          });
+                      } else
+                        res
+                          .status(200)
+                          .json({
+                            status: false,
+                            message: "Tweet not inserted",
+                          });
                       // if (results)
                     }
                   }
@@ -236,13 +315,25 @@ const posttweet = async (req, res) => {
                     listid,
                   ],
                   (err, results) => {
-                    if (err) res.status(400).json(err);
+                    if (err)
+                      res.status(400).json({ status: false, message: err });
                     else {
                       if (results.rows) {
                         if (username)
                           usernames(username, results.rows[0].tweetid);
-                        res.status(200).json("Your Tweet was sent.");
-                      } else res.status(200).json("Tweet not inserted");
+                        res
+                          .status(200)
+                          .json({
+                            status: true,
+                            message: "Your Tweet was sent.",
+                          });
+                      } else
+                        res
+                          .status(200)
+                          .json({
+                            status: false,
+                            message: "Tweet not inserted",
+                          });
                       // if (results)
                     }
                   }
@@ -275,12 +366,17 @@ const posttweet = async (req, res) => {
           listid,
         ],
         (err, results) => {
-          if (err) res.status(400).json(err);
+          if (err) res.status(400).json({ status: false, message: err });
           else {
             if (results.rows) {
               if (username) usernames(username, results.rows[0].tweetid);
-              res.status(200).json("Your Tweet was sent.");
-            } else res.status(200).json("Tweet not inserted");
+              res
+                .status(200)
+                .json({ status: true, message: "Your Tweet was sent." });
+            } else
+              res
+                .status(200)
+                .json({ status: false, message: "Tweet not inserted" });
           }
         }
       );
@@ -307,13 +403,18 @@ const posttweet = async (req, res) => {
           listid,
         ],
         (err, results) => {
-          if (err) res.status(400).json(err);
+          if (err) res.status(400).json({ status: false, message: err });
           else {
             if (results.rows) {
               analytics(results.rows[0].tweetid);
               if (username) usernames(username, results.rows[0].tweetid);
-              res.status(200).json("Your Tweet was sent.");
-            } else res.status(200).json("Tweet not inserted");
+              res
+                .status(200)
+                .json({ status: true, message: "Your Tweet was sent." });
+            } else
+              res
+                .status(200)
+                .json({ status: false, message: "Tweet not inserted" });
           }
         }
       );
@@ -339,13 +440,18 @@ const posttweet = async (req, res) => {
           listid,
         ],
         (err, results) => {
-          if (err) res.status(400).json(err);
+          if (err) res.status(400).json({ status: false, message: err });
           else {
             if (results.rows) {
               analytics(results.rows[0].tweetid);
               if (username) usernames(username, results.rows[0].tweetid);
-              res.status(200).json("Your Tweet was sent.");
-            } else res.status(200).json("Tweet not inserted");
+              res
+                .status(200)
+                .json({ status: true, message: "Your Tweet was sent." });
+            } else
+              res
+                .status(200)
+                .json({ status: false, message: "Tweet not inserted" });
           }
         }
       );
@@ -353,9 +459,10 @@ const posttweet = async (req, res) => {
     await retweets();
     await replies1(tweetid);
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
+
 //Function to display the entire tweets
 const showtweet = async (req, res) => {
   try {
@@ -389,6 +496,7 @@ const showtweet = async (req, res) => {
     ]).then(
       function ([twittercircletweets, everytweet]) {
         res.status(200).json({
+          status: true,
           twittercircletweets: twittercircletweets.rows,
           everyone: everytweet.rows,
         });
@@ -398,7 +506,7 @@ const showtweet = async (req, res) => {
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -423,15 +531,21 @@ const deletetweet = (req, res) => {
       "delete from tweets where userid=$1 AND tweetid=$2 ",
       [req.user.user_id, tweetid],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
-          if (results) res.status(200).json("Your tweet was deleted.");
-          else res.status(200).json("Your tweet was not deleted.");
+          if (results)
+            res
+              .status(200)
+              .json({ status: true, message: "Your tweet was deleted." });
+          else
+            res
+              .status(200)
+              .json({ status: false, message: "Your tweet was not deleted." });
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 

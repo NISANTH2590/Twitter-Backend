@@ -10,7 +10,7 @@ try {
     if (token) {
       jwt.verify(token, JWT_SECRET_KEY, (err, decoded) => {
         if (err) {
-          res.status(200).json({ message: "Invalid token." });
+          res.status(200).json({ status: false, message: "Invalid token." });
         } else {
           req.user = decoded;
           // console.log(req.user.user_id);
@@ -18,12 +18,12 @@ try {
         }
       });
     } else {
-      res.status(200).json({ message: "Missing token." });
+      res.status(200).json({ status: false, message: "Missing token." });
       return;
     }
   };
 } catch (err) {
-  res.status(400).json(err);
+  res.status(400).json({ status: false, message: err });
 }
 
 module.exports = { AuthenticateToken };

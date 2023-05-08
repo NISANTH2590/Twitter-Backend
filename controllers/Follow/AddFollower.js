@@ -8,17 +8,20 @@ const addfollower = async (req, res) => {
       "insert into follow (followersid,followingid) values ($1,$2) ",
       [userid, user],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
-          if (results) res.status(200).json("Follower Added");
+          if (results)
+            res.status(200).json({ status: true, message: "Follower Added" });
           else {
-            res.status(200).json("Follower Not Added");
+            res
+              .status(200)
+              .json({ status: false, message: "Follower Not Added" });
           }
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 

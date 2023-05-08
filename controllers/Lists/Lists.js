@@ -13,15 +13,17 @@ const createlist = (req, res) => {
         req.user.user_id,
       ],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
-          if (results) res.status(200).json("List Added");
-          else res.status(200).json("List not Added");
+          if (results)
+            res.status(200).json({ status: true, message: "List Added" });
+          else
+            res.status(200).json({ status: false, message: "List not Added" });
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -43,15 +45,17 @@ const user_lists = (req, res) => {
       "select name from lists join user_lists on user_lists.listid = lists.listid where user_lists.userid=$1",
       [req.user.user_id],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
-          if (results.rows.length) res.status(200).json(results.rows);
-          else res.status(200).json("no user lists");
+          if (results.rows.length)
+            res.status(200).json({ status: true, data: results.rows });
+          else
+            res.status(200).json({ status: false, message: "no user lists" });
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -63,14 +67,14 @@ const deletelist = (req, res) => {
       [listid],
       (err, results) => {
         if (err) {
-          res.status(400).json(err);
+          res.status(400).json({ status: false, message: err });
         } else {
-          res.status(200).json("List Removed");
+          res.status(200).json({ status: true, message: "List Removed" });
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -81,15 +85,21 @@ const addtweet = (req, res) => {
       "insert into list_tweets (listid,tweetid) values ($1,$2)",
       [body.listid, body.tweetid],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
-          if (results) res.status(200).json("Tweet added to the list");
-          else res.status(200).json("Tweet not Added to the list");
+          if (results)
+            res
+              .status(200)
+              .json({ status: true, message: "Tweet added to the list" });
+          else
+            res
+              .status(200)
+              .json({ status: true, message: "Tweet not Added to the list" });
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -100,15 +110,21 @@ const display_list_tweet = (req, res) => {
       "select * from list_tweets join tweets on tweets.tweetid = list_tweets.tweetid where list_tweets.listid = $1",
       [listid],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
-          if (results) res.status(200).json("Tweet added to the list");
-          else res.status(200).json("Tweet not Added to the list");
+          if (results)
+            res
+              .status(200)
+              .json({ status: true, message: "Tweet added to the list" });
+          else
+            res
+              .status(200)
+              .json({ status: false, message: "Tweet not Added to the list" });
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -119,15 +135,19 @@ const addlist = (req, res) => {
       "insert into user_lists (userid ,listid) values ($1,$2)",
       [body.userid, body.listid],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         {
-          if (results) res.status(200).json("user list added");
-          else res.status(200).json("user list not Added");
+          if (results)
+            res.status(200).json({ status: true, message: "user list added" });
+          else
+            res
+              .status(200)
+              .json({ status: false, message: "user list not Added" });
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 

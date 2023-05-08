@@ -16,13 +16,12 @@ cloudinary.config({
 });
 
 const storage = multer.diskStorage({
-  destination: "./public/uploads/",
+  destination: "./public/uploads",
   filename: function (req, file, cb) {
     let name =
       file.fieldname + "_" + Date.now() + path.extname(file.originalname);
     cb(null, name);
   },
-  // cloudinary
 });
 
 const uploadpic = multer({
@@ -34,7 +33,7 @@ const uploadpic = multer({
 }).single("myImage");
 
 function checkFileType(file, cb) {
-  const fileTypes = /jpeg|jpg|png/;
+  const fileTypes = /jpeg|jpg|png|mp4/;
 
   const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
   const mimeType = fileTypes.test(file.mimetype);
@@ -65,19 +64,21 @@ const upload = (req, res) => {
   try {
     uploadpic(req, res, async (err) => {
       if (err) {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
       } else {
-        let url = await cloudinary.uploader.upload(req.file.path);
+        let url = await cloudinary.uploader.upload(req.file.path, {
+          resource_type: "auto",
+        });
         // console.log(url.secure_url);
         database.query(
           "update UserAccount set profilepicture_url=$1 where id = $2",
           [url.secure_url, req.user.user_id],
           (err, results) => {
-            if (err) res.status(400).json(err);
+            if (err) res.status(400).json({ status: false, message: err });
             else if (results) {
-              res.status(200).json("Profile Picture Updated");
-            } else {
-              res.status(200).json("Profile Picture Not Updated");
+              res
+                .status(200)
+                .json({ status: true, message: "Profile Picture Updated" });
             }
           }
         );
@@ -90,13 +91,11 @@ const upload = (req, res) => {
         //   .catch((err) => {
         //     console.log(err);
         //   });
-        // console.log(req.file);
         fs.unlinkSync(req.file.path);
-        // res.send("test");
       }
     });
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -106,12 +105,12 @@ const profile = async (req, res) => {
       "select id,name,username,email,phonenumber,profilepicture_url,bio,website,verified,createdat,gender from UserAccount where id = $1",
       [req.user.user_id],
       async (err, results) => {
-        if (err) res.status(400).json(err);
-        else res.status(200).json(results.rows);
+        if (err) res.status(400).json({ status: false, message: err });
+        else res.status(200).json({ status: true, data: results.rows });
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -125,18 +124,22 @@ const remove_profile_pic = async (req, res) => {
       "update UserAccount set profilepicture_url=$1 where id = $2",
       [null, req.user.user_id],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
           if (results) {
-            res.status(200).json("Profile Picture Removed");
+            res
+              .status(200)
+              .json({ status: true, message: "Profile Picture Removed" });
           } else {
-            res.status(200).json("Profile Picture Not Removed");
+            res
+              .status(200)
+              .json({ status: false, message: "Profile Picture Not Removed" });
           }
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -146,18 +149,22 @@ const remove_header_pic = async (req, res) => {
       "update UserAccount set header=$1 where id = $2",
       [null, req.user.user_id],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
           if (results) {
-            res.status(200).json("Header Picture Removed");
+            res
+              .status(200)
+              .json({ status: true, message: "Header Picture Removed" });
           } else {
-            res.status(200).json("Header Picture Not Removed");
+            res
+              .status(200)
+              .json({ status: false, message: "Header Picture Not Removed" });
           }
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -167,18 +174,22 @@ const remove_dob = (req, res) => {
       "update UserAccount set profilepicture_url=$1 where id = $2",
       [null, req.user.user_id],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
           if (results) {
-            res.status(200).json("DateofBirth Removed");
+            res
+              .status(200)
+              .json({ status: true, message: "DateofBirth Removed" });
           } else {
-            res.status(200).json("DateofBirth Not Removed");
+            res
+              .status(200)
+              .json({ status: false, message: "DateofBirth Not Removed" });
           }
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
@@ -193,18 +204,20 @@ const update_profile_content = async (req, res) => {
       "update UserAccount set (header,bio,location,website) values ($1,$2,$3,$4) where id = $2",
       [null, req.user.user_id],
       (err, results) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ status: false, message: err });
         else {
           if (results) {
-            res.status(200).json("Profile Updated");
+            res.status(200).json({ status: true, message: "Profile Updated" });
           } else {
-            res.status(200).json("Profile Not Updated");
+            res
+              .status(200)
+              .json({ status: false, message: "Profile Not Updated" });
           }
         }
       }
     );
   } catch (err) {
-    res.status(400).json(err);
+    res.status(400).json({ status: false, message: err });
   }
 };
 
