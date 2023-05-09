@@ -22,12 +22,10 @@ const addtwittercircle = (req, res) => {
                     .status(200)
                     .json({ status: true, message: "friendid added" });
                 else
-                  res
-                    .status(200)
-                    .json({
-                      status: false,
-                      message: "Error inadding friendid",
-                    });
+                  res.status(200).json({
+                    status: false,
+                    message: "Error inadding friendid",
+                  });
               }
             }
           );
@@ -69,10 +67,6 @@ const deletetwittercircle = (req, res) => {
             res
               .status(200)
               .json({ status: true, message: "Friend id deleted" });
-          else
-            res
-              .status(200)
-              .json({ status: false, message: "Error in deleting a friendid" });
         }
       }
     );
