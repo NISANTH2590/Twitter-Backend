@@ -7,7 +7,7 @@ const addtwittercircle = (req, res) => {
       "select * from twittercircle where user_id = $1 AND friendid = $2",
       [req.user.user_id, friendid],
       (err, results) => {
-        if (err) throw err;
+        if (err) res.status(400).json({ status: false, message: err });
         if (results.rows.length) {
           res.status(400).json({ Message: "friendid Already added" });
         } else {

@@ -4,8 +4,9 @@ const addfollower = async (req, res) => {
   try {
     const user = req.body.userid;
     const userid = req.user.user_id;
+    console.log(user);
     await database.query(
-      "insert into follow (followersid,followingid) values ($1,$2) ",
+      "insert into follow (followerid,followingid) values ($1,$2) ",
       [userid, user],
       (err, results) => {
         if (err) res.status(400).json({ status: false, message: err });

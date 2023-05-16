@@ -27,8 +27,6 @@ try {
   var otpAuth = (req, res) => {
     var phone = req.body.phonenumber;
     var email = req.body.email;
-    // console.log(phone);
-    // console.log(email);
     if (phone) {
       // console.log("hi");
       client.messages

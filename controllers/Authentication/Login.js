@@ -90,7 +90,7 @@ var UserPassword = async (req, res) => {
                 async (err, results, fields) => {
                   if (err)
                     res.status(400).json({ status: false, message: err });
-                  res.status(200).json({ message: "Logged In" });
+                  res.status(200).json({ status: true, data: token });
                 }
               );
             } else {
@@ -102,6 +102,7 @@ var UserPassword = async (req, res) => {
         }
       );
     } else if (email) {
+      // console.log(email);
       database.query(
         "SELECT password,id FROM UserAccount WHERE email=$1",
         [email],
@@ -122,7 +123,7 @@ var UserPassword = async (req, res) => {
                 async (err, results, fields) => {
                   if (err)
                     res.status(400).json({ status: false, message: err });
-                  res.status(200).json({ message: "Logged In" });
+                  res.status(200).json({ status: true, data: token });
                 }
               );
             } else {
@@ -153,7 +154,7 @@ var UserPassword = async (req, res) => {
                 async (err, results, fields) => {
                   if (err)
                     res.status(400).json({ status: false, message: err });
-                  res.status(200).json({ message: "Logged In" });
+                  res.status(200).json({ status: true, data: token });
                 }
               );
             } else {

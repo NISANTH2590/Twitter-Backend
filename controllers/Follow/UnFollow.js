@@ -5,7 +5,7 @@ const unfollow = async (req, res) => {
     let user = req.body.userid;
 
     await database.query(
-      "delete from follow where followingid=$1 AND followersid = $2",
+      "delete from follow where followingid=$1 AND followerid = $2",
       [user, req.user.user_id],
       (err, results) => {
         if (err) res.status(400).json({ status: false, message: err });

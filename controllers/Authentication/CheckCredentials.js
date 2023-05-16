@@ -23,7 +23,7 @@ var UserCredentials = (req, res) => {
       if (err) {
         res.status(500).json({ message: "Database error." });
       } else if (result.rows.length === 0) {
-        res.status(400).json({ status: false, message: "Invalid credentials" });
+        res.status(200).json({ status: false, message: "Invalid credentials" });
       } else {
         res.status(200).json({ status: true, data: result.fields[0].name });
       }
@@ -47,10 +47,13 @@ var CheckEmail = (req, res) => {
             res.status(400).json({ status: false, message: err });
           } else {
             if (results.rows.length > 0) {
+              // console.log(email);
+              // console.log("hi");
               res
                 .status(200)
                 .json({ status: false, message: "Email is Already Taken" });
             } else {
+              // console.log(email);
               res.status(200).json({ status: true, message: "Success" });
             }
           }

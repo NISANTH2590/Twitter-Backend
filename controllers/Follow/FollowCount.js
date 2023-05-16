@@ -1,6 +1,7 @@
 const database = require("../../db.config");
 
 const followcount = async (req, res) => {
+  console.log("hi");
   try {
     Promise.all([
       database.query("select followingid from follow where followerid = $1", [
@@ -26,6 +27,49 @@ const followcount = async (req, res) => {
   }
 };
 
+const followercount = async (req, res) => {
+  console.log("hi");
+  try {
+    database.query(
+      "select name,username,profilepicture_url,bio,id,verified from UserAccount inner join follow on followerid = id where followingid = $1",
+      [req.user.user_id],
+      (err, results) => {
+        if (err) res.status(400).json({ status: false, message: err });
+        else {
+          res.status(200).json({
+            status: true,
+            // following: following.rows.length,
+            followers: results.rows,
+          });
+        }
+      }
+    );
+  } catch (err) {
+    res.status(400).json({ status: false, message: err });
+  }
+};
+
+const followingcount = async (req, res) => {
+  console.log("hi");
+  try {
+    database.query(
+      "select name,username,profilepicture_url,bio,id,verified from UserAccount inner join follow on followingid = id where followerid = $1",
+      [req.user.user_id],
+      (err, results) => {
+        if (err) res.status(400).json({ status: false, message: err });
+        else {
+          res.status(200).json({
+            status: true,
+            // following: following.rows.length,
+            following: results.rows,
+          });
+        }
+      }
+    );
+  } catch (err) {
+    res.status(400).json({ status: false, message: err });
+  }
+};
 //   let count = 0,
 //     count1 = 0;
 //   await database.query(
@@ -56,4 +100,4 @@ const followcount = async (req, res) => {
 //     }
 //   );
 
-module.exports = { followcount };
+module.exports = { followcount, followercount, followingcount };
