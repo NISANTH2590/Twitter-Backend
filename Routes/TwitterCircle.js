@@ -9,6 +9,10 @@ const {
 
 router.get("/twittercircle", AuthenticateToken, twittercircle);
 router.post("/addtwittercircle", AuthenticateToken, addtwittercircle);
-router.delete("/deletetwittercircle", AuthenticateToken, deletetwittercircle);
+router.delete(
+  "/deletetwittercircle/:id",
+  AuthenticateToken,
+  deletetwittercircle
+);
 
 module.exports = router;

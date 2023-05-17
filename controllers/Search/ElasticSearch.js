@@ -36,24 +36,26 @@ const search =
     try {
       // const term = req.body.searchterm;
       // const value = req.body.value;
-      const tweetid = req.body.tweetid;
-      const response = await elasticClient
-        .search({
-          timeout: "2s",
-          index: "tweets",
-          body: {
-            query: {
-              match: {
-                // userid: value,
-                tweetid: tweetid,
-              },
+      const username = req.body.username.toLowerCase();
+      const response = await elasticClient.search({
+        timeout: "2s",
+        index: "user",
+        body: {
+          query: {
+            prefix: {
+              username: username,
             },
+            // terms: {
+            //   username: letters,
+            //   boost: 1.0,
+            // },
+            // match: {
+            //   username: username,
+            // },
           },
-        })
-        .then((resp) => {
-          res.status(200).json({ status: true, data: resp.hits.hits });
-          // return res.status(200).json({
-        });
+        },
+      });
+      res.status(200).json({ status: true, data: response.hits });
       // The response variable now contains the search results
 
       // let query = { index: "tweets" };
@@ -110,10 +112,10 @@ const post =
   (bodyParser,
   (req, res) => {
     try {
-      const body = req.body;
+      const body = req.body.username;
       elasticClient
         .index({
-          index: "tweets",
+          index: "user",
           body: body,
         })
         .then((resp) => {

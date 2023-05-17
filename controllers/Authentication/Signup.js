@@ -12,9 +12,53 @@ const {
   JWT_SECRET_KEY,
 } = process.env;
 
-// console.log(JWT_SECRET_KEY);
+const elastic = require("elasticsearch");
+const bodyParser = require("body-parser");
+
+const elasticClient = elastic.Client({
+  host: "localhost:9200",
+});
 const client = new twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
+function insertUserClient(name) {
+  elasticClient
+    .index({
+      index: "user",
+      body: name,
+    })
+    .then((resp) => {
+      console.log("user inserted into elastic client");
+    });
+}
+
+async function updateUserClient(name, username1) {
+  const username = username1.toLowerCase();
+  // const response = await elasticClient.search({
+  //   timeout: "2s",
+  //   index: "user",
+  //   body: {
+  //     query: {
+  //       prefix: {
+  //         username: name,
+  //       },
+  //     },
+  //   },
+  // });
+  // let obj = response.hits.hits;
+  // console.log(obj.length);
+  // const response = await elasticClient.get({
+  //   index: "user",
+  //   id: username,
+  // });
+  const existingUsername = response;
+  console.log(existingUsername);
+  // existingUsername.username = username;
+  // await elasticClient.index({
+  //   index: "user",
+  //   id: username, // Assuming the username is used as the document ID
+  //   body: existingUsername,
+  // });
+}
 // "phone":"8533476534",
 // "pass":"nish@123",
 // "name":"nishnath",
@@ -85,6 +129,7 @@ try {
         [name, email, birthdate, phone, exp],
         (err, results) => {
           if (err) res.status(400).json({ status: false, message: err });
+          insertUserClient(name);
         }
       );
       if (email) {
@@ -193,11 +238,15 @@ try {
     // console.log(username);
     if (username) {
       database.query(
-        "update UserAccount set username=$1 where id = $2",
+        "update UserAccount set username=$1 where id = $2 returning name",
         [username, req.user.user_id],
-        (err, results) => {
+        async (err, results) => {
           if (err) res.status(400).json({ status: false, message: err });
-          res.status(200).json({ status: true, message: "user name inserted" });
+          await res.status(200).json({
+            status: true,
+            message: "user name inserted",
+          });
+          updateUserClient(results.rows[0].name, username);
         }
       );
     }
