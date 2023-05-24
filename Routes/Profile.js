@@ -2,8 +2,9 @@ let express = require("express");
 const router = express.Router();
 const { AuthenticateToken } = require("../middleware/Authorization");
 const {
-  profile,
+  userProfile,
   // update_profile_pic,
+  friendProfile,
   remove_profile_pic,
   remove_header_pic,
   remove_dob,
@@ -12,7 +13,8 @@ const {
 } = require("../controllers/Profile/UserProfile");
 
 router.post("/uploadprofilepic", AuthenticateToken, upload);
-router.get("/profile", AuthenticateToken, profile);
+router.get("/profile", AuthenticateToken, userProfile);
+router.get("/friendProfile/:id", AuthenticateToken, friendProfile);
 router.patch("/removeprofilepic", AuthenticateToken, remove_profile_pic);
 router.patch("/removeheaderpic", AuthenticateToken, remove_header_pic);
 router.patch("/removedob", AuthenticateToken, remove_dob);

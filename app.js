@@ -22,6 +22,7 @@ const trending = require("./Routes/Trending");
 const follow = require("./Routes/Follow");
 const bodyParser = require("body-parser");
 const twittercircle = require("./Routes/TwitterCircle");
+const friendSuggestions = require("./Routes/friendsuggestions");
 
 app.use(
   // limiter,
@@ -40,7 +41,8 @@ app.use(
   misc,
   trending,
   follow,
-  twittercircle
+  twittercircle,
+  friendSuggestions
 );
 
 app.listen(port, (err) => {

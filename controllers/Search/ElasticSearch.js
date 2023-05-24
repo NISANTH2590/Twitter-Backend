@@ -36,14 +36,14 @@ const search =
     try {
       // const term = req.body.searchterm;
       // const value = req.body.value;
-      const username = req.body.username.toLowerCase();
+      const username = req.body.name.toLowerCase();
       const response = await elasticClient.search({
         timeout: "2s",
         index: "user",
         body: {
           query: {
             prefix: {
-              username: username,
+              name: username,
             },
             // terms: {
             //   username: letters,
@@ -55,7 +55,7 @@ const search =
           },
         },
       });
-      res.status(200).json({ status: true, data: response.hits });
+      res.status(200).json({ status: true, data: response.hits.hits });
       // The response variable now contains the search results
 
       // let query = { index: "tweets" };

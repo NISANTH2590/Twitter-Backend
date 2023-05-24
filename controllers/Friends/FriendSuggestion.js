@@ -9,14 +9,12 @@ const showfriends = (req, res) => {
     if (!offset) offset = 0;
     offset = limit * offset;
     database.query(
-      "select id,name,username,profilepicture_url,bio,verified from UserAccount where id!=$1 limit  $2 offset $3",
-      [req.user.user_id, limit, offset],
+      "SELECT id, name, username, profilepicture_url, bio, verified FROM UserAccount WHERE id!=$1 AND id NOT IN (SELECT followerid FROM follow where followingid = $2 UNION SELECT followingid FROM follow where followerid = $3)limit  $4 offset $5 ",
+      [req.user.user_id, req.user.user_id, req.user.user_id, limit, offset],
       (err, results) => {
         if (err) res.status(400).json({ status: false, message: err });
-        else {
-          if (results)
-            res.status(200).json({ status: true, data: results.rows });
-        }
+        if (results.rows.length)
+          res.status(200).json({ status: true, data: results.rows });
       }
     );
   } catch (err) {

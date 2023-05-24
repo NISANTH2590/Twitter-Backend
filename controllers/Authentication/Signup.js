@@ -20,7 +20,8 @@ const elasticClient = elastic.Client({
 });
 const client = new twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
-function insertUserClient(name) {
+async function insertUserClient(name) {
+  console.log(name);
   elasticClient
     .index({
       index: "user",
@@ -29,35 +30,6 @@ function insertUserClient(name) {
     .then((resp) => {
       console.log("user inserted into elastic client");
     });
-}
-
-async function updateUserClient(name, username1) {
-  const username = username1.toLowerCase();
-  // const response = await elasticClient.search({
-  //   timeout: "2s",
-  //   index: "user",
-  //   body: {
-  //     query: {
-  //       prefix: {
-  //         username: name,
-  //       },
-  //     },
-  //   },
-  // });
-  // let obj = response.hits.hits;
-  // console.log(obj.length);
-  // const response = await elasticClient.get({
-  //   index: "user",
-  //   id: username,
-  // });
-  const existingUsername = response;
-  console.log(existingUsername);
-  // existingUsername.username = username;
-  // await elasticClient.index({
-  //   index: "user",
-  //   id: username, // Assuming the username is used as the document ID
-  //   body: existingUsername,
-  // });
 }
 // "phone":"8533476534",
 // "pass":"nish@123",
@@ -111,8 +83,8 @@ try {
   res.status(400).json({ status: false, message: err });
 }
 
-try {
-  var verifyotp = (req, res) => {
+var verifyotp = (req, res) => {
+  try {
     var phone = req.body.phone;
     var email = req.body.email;
     var name = req.body.name;
@@ -189,34 +161,39 @@ try {
         );
       }
     } else res.status(200).json({ status: false, message: "Invalid OTP" });
-  };
-} catch (err) {
-  res.status(400).json({ status: false, message: err });
-}
+  } catch (err) {
+    res.status(400).json({ status: false, message: err });
+  }
+};
 
-try {
-  var password = async (req, res) => {
+var password = async (req, res) => {
+  try {
     var pass = req.body.password;
     // console.log(pass);
     const salt = await bcrypt.genSalt(10);
     pass = await bcrypt.hash(pass, salt);
     database.query(
-      "update UserAccount set password=$1 where id = $2",
+      "update UserAccount set password=$1 where id = $2 returning id,name,username,profilepicture_url,verified",
       [pass, req.user.user_id],
       (err, results) => {
         if (err) res.status(400).json({ status: false, message: err });
         else {
-          res.status(200).json({ status: true, message: "Password Inserted" });
+          res.status(200).json({
+            status: true,
+            message: "Password Inserted",
+            data: results.rows[0],
+          });
+          insertUserClient(results.rows[0]);
         }
       }
     );
-  };
-} catch (err) {
-  res.status(400).json({ status: false, message: err });
-}
+  } catch (err) {
+    res.status(400).json({ status: false, message: err });
+  }
+};
 
-try {
-  var username = async (req, res) => {
+var username = async (req, res) => {
+  try {
     var name;
     database.query(
       "select name from UserAccount where id = $1",
@@ -227,13 +204,13 @@ try {
         res.status(200).json({ status: true, data: name + usernameotp });
       }
     );
-  };
-} catch (err) {
-  res.status(400).json({ status: false, message: err });
-}
+  } catch (err) {
+    res.status(400).json({ status: false, message: err });
+  }
+};
 
-try {
-  var insertusername = async (req, res) => {
+var insertusername = async (req, res) => {
+  try {
     var username = req.body.username;
     // console.log(username);
     if (username) {
@@ -250,13 +227,13 @@ try {
         }
       );
     }
-  };
-} catch (err) {
-  res.status(400).json({ status: false, message: err });
-}
+  } catch (err) {
+    res.status(400).json({ status: false, message: err });
+  }
+};
 
-try {
-  var notification_permission = async (req, res) => {
+var notification_permission = async (req, res) => {
+  try {
     var notification = req.body.notification;
     database.query(
       "update UserAccount set notification_permission=$1 where id = $2",
@@ -268,10 +245,10 @@ try {
           .json({ status: true, message: "notification inserted" });
       }
     );
-  };
-} catch (err) {
-  res.status(400).json({ status: false, message: err });
-}
+  } catch (err) {
+    res.status(400).json({ status: false, message: err });
+  }
+};
 
 module.exports = {
   otpAuth,

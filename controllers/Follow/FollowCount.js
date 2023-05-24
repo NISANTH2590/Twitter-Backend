@@ -38,10 +38,6 @@ const followercount_recommended = async (req, res) => {
             status: true,
             followers: results.rows,
           });
-          // let followers = results.rows;
-          // followers.forEach((element) => {
-          //   let user = element.id;
-          // });
         }
       }
     );
@@ -49,32 +45,6 @@ const followercount_recommended = async (req, res) => {
     res.status(400).json({ status: false, message: err });
   }
 };
-
-// const followercountrename = async (req, res) => {
-//   try {
-//     let userid = req.user.user_id;
-//     database.query(
-//       "select * from follow twittercircle on followingid = user_id where user_id = $1 AND (followerid!=friendid) ",
-//       [userid],
-//       (err, results) => {
-//         if (err) res.status(400).json({ status: false, message: err });
-//         else {
-//           let followers = results.rows;
-//           // console.log(typeof followers);
-//           res.status(200).json({
-//             status: true,
-//             followers: results.rows,
-//           });
-//           followers.forEach((element) => {
-//             console.log(element);
-//           });
-//         }
-//       }
-//     );
-//   } catch (err) {
-//     res.status(400).json({ status: false, message: err });
-//   }
-// };
 
 const followingcount = async (req, res) => {
   try {

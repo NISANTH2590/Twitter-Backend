@@ -99,16 +99,34 @@ const upload = (req, res) => {
   }
 };
 
-const profile = async (req, res) => {
+const userProfile = async (req, res) => {
   try {
     await database.query(
-      "select id,name,username,email,phonenumber,profilepicture_url,bio,website,verified,createdat,gender from UserAccount where id = $1",
+      "select id,name,username,email,phonenumber,profilepicture_url,bio,website,verified,createdat,gender,location from UserAccount where id = $1",
       [req.user.user_id],
       async (err, results) => {
         if (err) res.status(400).json({ status: false, message: err });
         else res.status(200).json({ status: true, data: results.rows });
       }
     );
+  } catch (err) {
+    res.status(400).json({ status: false, message: err });
+  }
+};
+
+const friendProfile = async (req, res) => {
+  try {
+    let friendId = req.params.id;
+    if (friendId) {
+      await database.query(
+        "select id,name,username,email,phonenumber,profilepicture_url,bio,website,verified,createdat,gender,location from UserAccount where id = $1",
+        [friendId],
+        async (err, results) => {
+          if (err) res.status(400).json({ status: false, message: err });
+          else res.status(200).json({ status: true, data: results.rows });
+        }
+      );
+    }
   } catch (err) {
     res.status(400).json({ status: false, message: err });
   }
@@ -126,15 +144,9 @@ const remove_profile_pic = async (req, res) => {
       (err, results) => {
         if (err) res.status(400).json({ status: false, message: err });
         else {
-          if (results) {
-            res
-              .status(200)
-              .json({ status: true, message: "Profile Picture Removed" });
-          } else {
-            res
-              .status(200)
-              .json({ status: false, message: "Profile Picture Not Removed" });
-          }
+          res
+            .status(200)
+            .json({ status: false, message: "Profile Picture Not Removed" });
         }
       }
     );
@@ -171,20 +183,14 @@ const remove_header_pic = async (req, res) => {
 const remove_dob = (req, res) => {
   try {
     database.query(
-      "update UserAccount set profilepicture_url=$1 where id = $2",
+      "update UserAccount set birthdate=$1 where id = $2",
       [null, req.user.user_id],
       (err, results) => {
         if (err) res.status(400).json({ status: false, message: err });
         else {
-          if (results) {
-            res
-              .status(200)
-              .json({ status: true, message: "DateofBirth Removed" });
-          } else {
-            res
-              .status(200)
-              .json({ status: false, message: "DateofBirth Not Removed" });
-          }
+          res
+            .status(200)
+            .json({ status: true, message: "DateofBirth Removed" });
         }
       }
     );
@@ -201,8 +207,8 @@ const update_profile_content = async (req, res) => {
     const location = req.body.location;
     const website = req.body.website;
     database.query(
-      "update UserAccount set (header,bio,location,website) values ($1,$2,$3,$4) where id = $2",
-      [null, req.user.user_id],
+      "update UserAccount set (header,bio,location,website) values ($1,$2,$3,$4) where id = $5",
+      [header, bio, location, website, req.user.user_id],
       (err, results) => {
         if (err) res.status(400).json({ status: false, message: err });
         else {
@@ -222,7 +228,8 @@ const update_profile_content = async (req, res) => {
 };
 
 module.exports = {
-  profile,
+  userProfile,
+  friendProfile,
   // update_profile_pic,
   remove_profile_pic,
   remove_header_pic,

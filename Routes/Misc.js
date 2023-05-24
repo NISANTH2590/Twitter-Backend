@@ -3,7 +3,12 @@ const router = express.Router();
 const { AuthenticateToken } = require("../middleware/Authorization");
 
 const { views } = require("../controllers/Tweets/Views");
-
+const {
+  addActivity,
+  // mentionedActivities,
+  Notification,
+  // likeNotification,
+} = require("../controllers/Notifications/activity");
 const {
   add_vote_choice1,
   add_vote_choice2,
@@ -24,22 +29,17 @@ const {
   removenotinterested,
 } = require("../controllers/NotInterestedTopics/NotInterested");
 
-const { showfriends } = require("../controllers/Friends/FriendSuggestion");
-// const {
-//   mentionedactivities,
-// } = require("../advance_concepts/Notifications/activity");
 router.patch("/addview", AuthenticateToken, views);
+
+router.post("/addActivity", AuthenticateToken, addActivity);
+// router.get("/mentionedactivities", AuthenticateToken, mentionedActivities);
+router.get("/Notification", AuthenticateToken, Notification);
+// router.get("/likeNotification", AuthenticateToken, likeNotification);
 
 router.post("/addnotinterested", AuthenticateToken, addnotinterested);
 router.delete("/removenotinterested", AuthenticateToken, removenotinterested);
 
-router.get("/friendsuggestions", AuthenticateToken, showfriends);
-
 router.post("/showreply", AuthenticateToken, showreply);
-
-// this is sample test hashtag function I have implemented prisma orm here !!!!!!!!!!!!
-// router.post("/hashtags", AuthenticateToken, hashtags); // this is sample test hashtag function
-// this is sample test hashtag function
 
 router.patch("/choice1_vote", AuthenticateToken, add_vote_choice1);
 router.patch("/choice2_vote", AuthenticateToken, add_vote_choice2);
