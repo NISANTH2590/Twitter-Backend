@@ -97,11 +97,12 @@ var verifyotp = (req, res) => {
     if (OTP == otp) {
       // console.log("ihj");
       database.query(
-        "insert into UserAccount(name,email,birthdate,phonenumber,experience,createdat) values ($1,$2,$3,$4,$5,NOW())",
+        "with first as(insert into UserAccount(name,email,birthdate,phonenumber,experience,createdat) values ($1,$2,$3,$4,$5,NOW()) returning id ),second as (insert into dobvisiblity (userid,monthdayvisiblity,yearvisiblity)  select id,'youfolloweachother','onlyyou' from first)SELECT * FROM first;",
+        // "insert into UserAccount(name,email,birthdate,phonenumber,experience,createdat) values ($1,$2,$3,$4,$5,NOW())",
         [name, email, birthdate, phone, exp],
         (err, results) => {
           if (err) res.status(400).json({ status: false, message: err });
-          insertUserClient(name);
+          // insertUserClient(name);
         }
       );
       if (email) {

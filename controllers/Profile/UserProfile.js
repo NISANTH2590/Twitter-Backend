@@ -70,8 +70,20 @@ const upload = (req, res) => {
           resource_type: "auto",
         });
         // console.log(url.secure_url);
+        // database.query(
+        //   "update UserAccount set profilepicture_url=$1 where id = $2",
+        //   [url.secure_url, req.user.user_id],
+        //   (err, results) => {
+        //     if (err) res.status(400).json({ status: false, message: err });
+        //     else if (results) {
+        //       res
+        //         .status(200)
+        //         .json({ status: true, message: "Profile Picture Updated" });
+        //     }
+        //   }
+        // );
         database.query(
-          "update UserAccount set profilepicture_url=$1 where id = $2",
+          "update UserAccount set header=$1 where id = $2",
           [url.secure_url, req.user.user_id],
           (err, results) => {
             if (err) res.status(400).json({ status: false, message: err });
@@ -102,7 +114,7 @@ const upload = (req, res) => {
 const userProfile = async (req, res) => {
   try {
     await database.query(
-      "select id,name,username,email,phonenumber,profilepicture_url,bio,website,verified,createdat,gender,location from UserAccount where id = $1",
+      "SELECT ua.id,ua.name,ua.username,ua.profilepicture_url,ua.header,ua.bio,ua.website,ua.verified,ua.createdat,ua.gender,ua.location,ua.birthdate,(SELECT COUNT(userid) FROM tweets WHERE userid = $1) AS tweet_count,(SELECT COUNT(followingid) FROM follow WHERE followerid = $1) AS following_count,(SELECT COUNT(followerid) FROM follow WHERE followingid = $1) AS follower_count FROM UserAccount ua WHERE ua.id = $1;",
       [req.user.user_id],
       async (err, results) => {
         if (err) res.status(400).json({ status: false, message: err });
@@ -119,11 +131,101 @@ const friendProfile = async (req, res) => {
     let friendId = req.params.id;
     if (friendId) {
       await database.query(
-        "select id,name,username,email,phonenumber,profilepicture_url,bio,website,verified,createdat,gender,location from UserAccount where id = $1",
+        "SELECT ua.id,ua.name,ua.username,ua.profilepicture_url,ua.header,ua.bio,ua.website,ua.verified,ua.createdat,ua.gender,ua.location,ua.birthdate,(SELECT COUNT(userid) FROM tweets WHERE userid = $1) AS tweet_count,(SELECT COUNT(followingid) FROM follow WHERE followerid = $1) AS following_count,(SELECT COUNT(followerid) FROM follow WHERE followingid = $1) AS follower_count FROM UserAccount ua WHERE ua.id = $1;",
         [friendId],
         async (err, results) => {
           if (err) res.status(400).json({ status: false, message: err });
-          else res.status(200).json({ status: true, data: results.rows });
+          else {
+            let data = results.rows[0];
+
+            let visibilityDob = true;
+            console.log("sad1qqqq9rdywi3y");
+            await database.query(
+              `Select * from dobvisiblity where userid =${friendId}`,
+              async (err, results) => {
+                const { monthdayvisiblity, yearvisiblity } = results.rows[0];
+                if (monthdayvisiblity == "yourfollowers") {
+                  console.log("sad1qqqq");
+                  database.query(
+                    `select followerid from follow where followingid =${friendId} AND followerid = ${req.user.user_id}`,
+                    (err, results) => {
+                      if (!results.rows.length) {
+                        console.log("sad1");
+                        visibilityDob = false;
+                        res.status(200).json({
+                          status: true,
+                          data: data,
+                          visibility: visibilityDob,
+                        });
+                      } else {
+                        res.status(200).json({
+                          status: true,
+                          data: data,
+                          visibility: visibilityDob,
+                        });
+                      }
+                    }
+                  );
+                } else if (monthdayvisiblity == "peopleyoufollow") {
+                  database.query(
+                    `select followingid from follow where followerid =${friendId} AND followingid = ${req.user.user_id}`,
+                    (err, results) => {
+                      if (!results.rows.length) {
+                        console.log("sad2");
+                        visibilityDob = false;
+                        res.status(200).json({
+                          status: true,
+                          data: data,
+                          visibility: visibilityDob,
+                        });
+                      } else {
+                        res.status(200).json({
+                          status: true,
+                          data: data,
+                          visibility: visibilityDob,
+                        });
+                      }
+                    }
+                  );
+                } else if (monthdayvisiblity == "youfolloweachother") {
+                  database.query(
+                    `SELECT 1 FROM follow AS f1 WHERE f1.followerid = ${friendId} AND f1.followingid = ${req.user.user_id}AND EXISTS (SELECT 1 FROM follow AS f2 WHERE f2.followerid = ${req.user.user_id} AND f2.followingid = ${friendId});`,
+                    (err, results) => {
+                      if (!results.rows.length) {
+                        console.log("sad2");
+                        visibilityDob = false;
+                        res.status(200).json({
+                          status: true,
+                          data: data,
+                          visibility: visibilityDob,
+                        });
+                      } else {
+                        res.status(200).json({
+                          status: true,
+                          data: data,
+                          visibility: visibilityDob,
+                        });
+                      }
+                    }
+                  );
+                } else if (monthdayvisiblity == "public") {
+                  res.status(200).json({
+                    status: true,
+                    data: data,
+                    visibility: true,
+                  });
+                } else {
+                  res.status(200).json({
+                    status: true,
+                    data: data,
+                    visibility: false,
+                  });
+                }
+                console.log("happkddwsnekny");
+              }
+            );
+            console.log("happy");
+          }
         }
       );
     }
@@ -132,9 +234,39 @@ const friendProfile = async (req, res) => {
   }
 };
 
-// const update_profile_pic = async (req, res) => {
-//   const pic = req.body.profilepicture;
-// };
+const update_profile_content = async (req, res) => {
+  try {
+    const name = req.body.name;
+    const header = req.body.header;
+    const bio = req.body.bio;
+    const location = req.body.location;
+    const website = req.body.website;
+    const birthDate = req.body.birthDate;
+    const monthDayVisiblity = req.body.monthDayVisiblity;
+    const yearVisiblity = req.body.yearVisiblity;
+    database.query(
+      `BEGIN; update useraccount set name = '${name}', header = '${header}', bio='${bio}',location='${location}',website='${website}',birthdate='${birthDate}' where id = ${req.user.user_id}; UPDATE dobvisiblity SET monthdayvisiblity = '${monthDayVisiblity}',yearvisiblity='${yearVisiblity}' where userid = ${req.user.user_id};commit;`,
+      // "BEGIN; update useraccount set header = $1,bio=$2,location=$3,website=$4,birthdate=$5 where id = $6; UPDATE dobvisiblity SET monthdayvisiblity = $7,yearvisiblity=$8 where userid = $9;commit;",
+      // [
+      // header,
+      // bio,
+      // location,
+      // website,
+      // birthDate,
+      // req.user.user_id,
+      // monthDayVisiblity,
+      // yearVisiblity,
+      // req.user.user_id,
+      // ],
+      (err, results) => {
+        if (err) res.status(400).json({ status: false, message: err });
+        else res.status(200).json({ status: true, message: "Profile Updated" });
+      }
+    );
+  } catch (err) {
+    res.status(400).json({ status: false, message: err });
+  }
+};
 
 const remove_profile_pic = async (req, res) => {
   try {
@@ -199,38 +331,9 @@ const remove_dob = (req, res) => {
   }
 };
 
-const update_profile_content = async (req, res) => {
-  try {
-    const name = req.body.name;
-    const header = req.body.header;
-    const bio = req.body.bio;
-    const location = req.body.location;
-    const website = req.body.website;
-    database.query(
-      "update UserAccount set (header,bio,location,website) values ($1,$2,$3,$4) where id = $5",
-      [header, bio, location, website, req.user.user_id],
-      (err, results) => {
-        if (err) res.status(400).json({ status: false, message: err });
-        else {
-          if (results) {
-            res.status(200).json({ status: true, message: "Profile Updated" });
-          } else {
-            res
-              .status(200)
-              .json({ status: false, message: "Profile Not Updated" });
-          }
-        }
-      }
-    );
-  } catch (err) {
-    res.status(400).json({ status: false, message: err });
-  }
-};
-
 module.exports = {
   userProfile,
   friendProfile,
-  // update_profile_pic,
   remove_profile_pic,
   remove_header_pic,
   remove_dob,

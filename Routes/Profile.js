@@ -3,7 +3,6 @@ const router = express.Router();
 const { AuthenticateToken } = require("../middleware/Authorization");
 const {
   userProfile,
-  // update_profile_pic,
   friendProfile,
   remove_profile_pic,
   remove_header_pic,
