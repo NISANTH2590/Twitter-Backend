@@ -3,6 +3,6 @@ const router = express.Router();
 const { AuthenticateToken } = require("../middleware/Authorization");
 const { showfriends } = require("../controllers/Friends/FriendSuggestion");
 
-router.get("/friendsuggestions", AuthenticateToken, showfriends);
+router.post("/friendsuggestions", AuthenticateToken, showfriends);
 
 module.exports = router;

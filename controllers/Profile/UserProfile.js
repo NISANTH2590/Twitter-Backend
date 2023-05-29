@@ -82,18 +82,45 @@ const upload = (req, res) => {
         //     }
         //   }
         // );
-        database.query(
-          "update UserAccount set header=$1 where id = $2",
-          [url.secure_url, req.user.user_id],
-          (err, results) => {
-            if (err) res.status(400).json({ status: false, message: err });
-            else if (results) {
-              res
-                .status(200)
-                .json({ status: true, message: "Profile Picture Updated" });
-            }
-          }
-        );
+        // database.query(
+        //   "update UserAccount set header=$1 where id = $2",
+        //   [url.secure_url, req.user.user_id],
+        //   (err, results) => {
+        //     if (err) res.status(400).json({ status: false, message: err });
+        //     else if (results) {
+        //       res
+        //         .status(200)
+        //         .json({ status: true, message: "Profile Picture Updated" });
+        //     }
+        //   }
+        // );
+
+        // database.query(
+        //   `CREATE OR REPLACE FUNCTION generate_random_location() RETURNS TEXT AS $$
+        //   DECLARE
+        //       random_place TEXT;
+        //   BEGIN
+        //       SELECT place
+        //       FROM unnest(ARRAY['New York', 'London', 'Paris', 'Tokyo', 'Sydney', 'Rome', 'Berlin', 'Moscow', 'Los Angeles', 'Toronto', 'Mumbai', 'Rio de Janeiro', 'Cape Town', 'Dubai', 'Amsterdam', 'Stockholm', 'Buenos Aires', 'Seoul', 'Cairo', 'Athens', 'Hong Kong', 'Singapore', 'Barcelona', 'Helsinki', 'Mexico City', 'Vienna', 'Zurich', 'Prague', 'Bangkok', 'Dublin', 'Delhi', 'Nairobi', 'Istanbul', 'Beijing', 'Melbourne', 'Vancouver', 'San Francisco', 'Madrid', 'Lisbon', 'Warsaw', 'Brussels', 'Budapest', 'Jakarta', 'Havana', 'Edinburgh', 'Marrakech', 'São Paulo', 'Wellington', 'Copenhagen', 'Reykjavik'])
+        //       AS place ORDER BY random() LIMIT 1 INTO random_place;
+
+        //       RETURN random_place;
+        //   END;
+        //   $$ LANGUAGE plpgsql;
+        //   UPDATE useraccount
+        //   SET location = generate_random_location()
+        //   WHERE location IS NULL OR location = '';`,
+
+        //   (err, results) => {
+        //     if (err) res.status(400).json({ status: false, message: err });
+        //     else if (results) {
+        //       res
+        //         .status(200)
+        //         .json({ status: true, message: "Profile Picture Updated" });
+        //     }
+        //   }
+        // );
+
         // const res = await cloudinary.uploader.upload(req.file.path);
         // res
         //   .then((data) => {
@@ -112,6 +139,8 @@ const upload = (req, res) => {
 };
 
 const userProfile = async (req, res) => {
+  console.log("i");
+  // res.send("hello");
   try {
     await database.query(
       "SELECT ua.id,ua.name,ua.username,ua.profilepicture_url,ua.header,ua.bio,ua.website,ua.verified,ua.createdat,ua.gender,ua.location,ua.birthdate,(SELECT COUNT(userid) FROM tweets WHERE userid = $1) AS tweet_count,(SELECT COUNT(followingid) FROM follow WHERE followerid = $1) AS following_count,(SELECT COUNT(followerid) FROM follow WHERE followingid = $1) AS follower_count FROM UserAccount ua WHERE ua.id = $1;",
@@ -128,103 +157,222 @@ const userProfile = async (req, res) => {
 
 const friendProfile = async (req, res) => {
   try {
-    let friendId = req.params.id;
-    if (friendId) {
+    let friendUserName = req.body.friendUserName;
+    console.log("ik", friendUserName);
+    if (friendUserName) {
       await database.query(
-        "SELECT ua.id,ua.name,ua.username,ua.profilepicture_url,ua.header,ua.bio,ua.website,ua.verified,ua.createdat,ua.gender,ua.location,ua.birthdate,(SELECT COUNT(userid) FROM tweets WHERE userid = $1) AS tweet_count,(SELECT COUNT(followingid) FROM follow WHERE followerid = $1) AS following_count,(SELECT COUNT(followerid) FROM follow WHERE followingid = $1) AS follower_count FROM UserAccount ua WHERE ua.id = $1;",
-        [friendId],
+        "SELECT ua.id FROM UserAccount ua WHERE ua.username = $1;",
+        [friendUserName],
         async (err, results) => {
           if (err) res.status(400).json({ status: false, message: err });
           else {
-            let data = results.rows[0];
-
-            let visibilityDob = true;
-            console.log("sad1qqqq9rdywi3y");
+            let friendId = results.rows[0].id;
             await database.query(
-              `Select * from dobvisiblity where userid =${friendId}`,
+              "SELECT ua.id,ua.name,ua.username,ua.profilepicture_url,ua.header,ua.bio,ua.website,ua.verified,ua.createdat,ua.gender,ua.location,ua.birthdate,(SELECT COUNT(userid) FROM tweets WHERE userid = $1) AS tweet_count,(SELECT COUNT(followingid) FROM follow WHERE followerid = $1) AS following_count,(SELECT COUNT(followerid) FROM follow WHERE followingid = $1) AS follower_count FROM UserAccount ua WHERE ua.id = $1;",
+              [friendId],
               async (err, results) => {
-                const { monthdayvisiblity, yearvisiblity } = results.rows[0];
-                if (monthdayvisiblity == "yourfollowers") {
-                  console.log("sad1qqqq");
-                  database.query(
-                    `select followerid from follow where followingid =${friendId} AND followerid = ${req.user.user_id}`,
-                    (err, results) => {
-                      if (!results.rows.length) {
-                        console.log("sad1");
-                        visibilityDob = false;
+                if (err) res.status(400).json({ status: false, message: err });
+                else {
+                  let data = results.rows[0];
+
+                  let visibilityDob = true;
+                  // console.log("sad1qqqq9rdywi3y");
+                  await database.query(
+                    `Select * from dobvisiblity where userid =${friendId}`,
+                    async (err, results) => {
+                      const { monthdayvisiblity, yearvisiblity } =
+                        results.rows[0];
+                      if (monthdayvisiblity == "yourfollowers") {
+                        // console.log("sad1qqqq");
+                        database.query(
+                          `select followerid from follow where followingid =${friendId} AND followerid = ${req.user.user_id}`,
+                          (err, results) => {
+                            if (!results.rows.length) {
+                              visibilityDob = false;
+                              res.status(200).json({
+                                status: true,
+                                data: data,
+                                visibility: visibilityDob,
+                              });
+                            } else {
+                              res.status(200).json({
+                                status: true,
+                                data: data,
+                                visibility: visibilityDob,
+                              });
+                            }
+                          }
+                        );
+                      } else if (monthdayvisiblity == "peopleyoufollow") {
+                        database.query(
+                          `select followingid from follow where followerid =${friendId} AND followingid = ${req.user.user_id}`,
+                          (err, results) => {
+                            if (!results.rows.length) {
+                              visibilityDob = false;
+                              res.status(200).json({
+                                status: true,
+                                data: data,
+                                visibility: visibilityDob,
+                              });
+                            } else {
+                              res.status(200).json({
+                                status: true,
+                                data: data,
+                                visibility: visibilityDob,
+                              });
+                            }
+                          }
+                        );
+                      } else if (monthdayvisiblity == "youfolloweachother") {
+                        database.query(
+                          `SELECT 1 FROM follow AS f1 WHERE f1.followerid = ${friendId} AND f1.followingid = ${req.user.user_id}AND EXISTS (SELECT 1 FROM follow AS f2 WHERE f2.followerid = ${req.user.user_id} AND f2.followingid = ${friendId});`,
+                          (err, results) => {
+                            if (!results.rows.length) {
+                              visibilityDob = false;
+                              res.status(200).json({
+                                status: true,
+                                data: data,
+                                visibility: visibilityDob,
+                              });
+                            } else {
+                              res.status(200).json({
+                                status: true,
+                                data: data,
+                                visibility: visibilityDob,
+                              });
+                            }
+                          }
+                        );
+                      } else if (monthdayvisiblity == "public") {
                         res.status(200).json({
                           status: true,
                           data: data,
-                          visibility: visibilityDob,
+                          visibility: true,
                         });
                       } else {
                         res.status(200).json({
                           status: true,
                           data: data,
-                          visibility: visibilityDob,
+                          visibility: false,
                         });
                       }
+                      // console.log("happkddwsnekny");
                     }
                   );
-                } else if (monthdayvisiblity == "peopleyoufollow") {
-                  database.query(
-                    `select followingid from follow where followerid =${friendId} AND followingid = ${req.user.user_id}`,
-                    (err, results) => {
-                      if (!results.rows.length) {
-                        console.log("sad2");
-                        visibilityDob = false;
-                        res.status(200).json({
-                          status: true,
-                          data: data,
-                          visibility: visibilityDob,
-                        });
-                      } else {
-                        res.status(200).json({
-                          status: true,
-                          data: data,
-                          visibility: visibilityDob,
-                        });
-                      }
-                    }
-                  );
-                } else if (monthdayvisiblity == "youfolloweachother") {
-                  database.query(
-                    `SELECT 1 FROM follow AS f1 WHERE f1.followerid = ${friendId} AND f1.followingid = ${req.user.user_id}AND EXISTS (SELECT 1 FROM follow AS f2 WHERE f2.followerid = ${req.user.user_id} AND f2.followingid = ${friendId});`,
-                    (err, results) => {
-                      if (!results.rows.length) {
-                        console.log("sad2");
-                        visibilityDob = false;
-                        res.status(200).json({
-                          status: true,
-                          data: data,
-                          visibility: visibilityDob,
-                        });
-                      } else {
-                        res.status(200).json({
-                          status: true,
-                          data: data,
-                          visibility: visibilityDob,
-                        });
-                      }
-                    }
-                  );
-                } else if (monthdayvisiblity == "public") {
-                  res.status(200).json({
-                    status: true,
-                    data: data,
-                    visibility: true,
-                  });
-                } else {
-                  res.status(200).json({
-                    status: true,
-                    data: data,
-                    visibility: false,
-                  });
+                  // console.log("happy");
                 }
-                console.log("happkddwsnekny");
               }
             );
-            console.log("happy");
+          }
+        }
+      );
+    }
+  } catch (err) {
+    res.status(400).json({ status: false, message: err });
+  }
+};
+
+const friendYearVisibility = async (req, res) => {
+  try {
+    let friendUserName = req.body.friendUserName;
+    if (friendUserName) {
+      await database.query(
+        "SELECT ua.id FROM UserAccount ua WHERE ua.username = $1;",
+        [friendUserName],
+        async (err, results) => {
+          if (err) res.status(400).json({ status: false, message: err });
+          else {
+            let friendId = results.rows[0].id;
+            await database.query(
+              "SELECT ua.id,ua.name,ua.username,ua.profilepicture_url,ua.header,ua.bio,ua.website,ua.verified,ua.createdat,ua.gender,ua.location,ua.birthdate,(SELECT COUNT(userid) FROM tweets WHERE userid = $1) AS tweet_count,(SELECT COUNT(followingid) FROM follow WHERE followerid = $1) AS following_count,(SELECT COUNT(followerid) FROM follow WHERE followingid = $1) AS follower_count FROM UserAccount ua WHERE ua.id = $1;",
+              [friendId],
+              async (err, results) => {
+                if (err) res.status(400).json({ status: false, message: err });
+                else {
+                  let data = results.rows[0];
+
+                  let visibilityDob = true;
+                  // console.log("sad1qqqq9rdywi3y");
+                  await database.query(
+                    `Select * from dobvisiblity where userid =${friendId}`,
+                    async (err, results) => {
+                      const { yearvisiblity } = results.rows[0];
+                      if (yearvisiblity == "yourfollowers") {
+                        // console.log("sad1qqqq");
+                        database.query(
+                          `select followerid from follow where followingid =${friendId} AND followerid = ${req.user.user_id}`,
+                          (err, results) => {
+                            if (!results.rows.length) {
+                              console.log("sad1");
+                              visibilityDob = false;
+                              res.status(200).json({
+                                status: true,
+                                yearVisibility: visibilityDob,
+                              });
+                            } else {
+                              res.status(200).json({
+                                status: true,
+                                yearVisibility: visibilityDob,
+                              });
+                            }
+                          }
+                        );
+                      } else if (yearvisiblity == "peopleyoufollow") {
+                        database.query(
+                          `select followingid from follow where followerid =${friendId} AND followingid = ${req.user.user_id}`,
+                          (err, results) => {
+                            if (!results.rows.length) {
+                              console.log("sad2");
+                              visibilityDob = false;
+                              res.status(200).json({
+                                status: true,
+                                yearVisibility: visibilityDob,
+                              });
+                            } else {
+                              res.status(200).json({
+                                status: true,
+                                yearVisibility: visibilityDob,
+                              });
+                            }
+                          }
+                        );
+                      } else if (yearvisiblity == "youfolloweachother") {
+                        database.query(
+                          `SELECT 1 FROM follow AS f1 WHERE f1.followerid = ${friendId} AND f1.followingid = ${req.user.user_id}AND EXISTS (SELECT 1 FROM follow AS f2 WHERE f2.followerid = ${req.user.user_id} AND f2.followingid = ${friendId});`,
+                          (err, results) => {
+                            if (!results.rows.length) {
+                              console.log("sad3");
+                              visibilityDob = false;
+                              res.status(200).json({
+                                status: true,
+                                yearVisibility: visibilityDob,
+                              });
+                            } else {
+                              res.status(200).json({
+                                status: true,
+                                yearVisibility: visibilityDob,
+                              });
+                            }
+                          }
+                        );
+                      } else if (yearvisiblity == "public") {
+                        res.status(200).json({
+                          status: true,
+                          yearVisibility: true,
+                        });
+                      } else {
+                        res.status(200).json({
+                          status: true,
+                          yearVisibility: false,
+                        });
+                      }
+                      // console.log("happkddwsnekny");
+                    }
+                  );
+                  // console.log("happy");
+                }
+              }
+            );
           }
         }
       );
@@ -235,17 +383,35 @@ const friendProfile = async (req, res) => {
 };
 
 const update_profile_content = async (req, res) => {
+  // console.log("hi");
   try {
+    // console.log(req);
     const name = req.body.name;
+    let birthDateNew;
     const header = req.body.header;
+    // if (!header) header = null;
     const bio = req.body.bio;
     const location = req.body.location;
     const website = req.body.website;
-    const birthDate = req.body.birthDate;
-    const monthDayVisiblity = req.body.monthDayVisiblity;
-    const yearVisiblity = req.body.yearVisiblity;
+    let birthDate = req.body.birthDate;
+    let str = req.body.monthDayVisibility;
+    let str2 = req.body.yearVisibility;
+    let result = str.replace(/\s/g, "");
+    const monthDayVisibility = result;
+    result = str2.replace(/\s/g, "");
+    const yearVisibility = result;
+    if (birthDate) {
+      const date = new Date(birthDate);
+      const day = date.getDate();
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+      birthDate = `${day}-${month}-${year}`;
+      // console.log(birthDate);
+    } else {
+      birthDate = `null`;
+    }
     database.query(
-      `BEGIN; update useraccount set name = '${name}', header = '${header}', bio='${bio}',location='${location}',website='${website}',birthdate='${birthDate}' where id = ${req.user.user_id}; UPDATE dobvisiblity SET monthdayvisiblity = '${monthDayVisiblity}',yearvisiblity='${yearVisiblity}' where userid = ${req.user.user_id};commit;`,
+      `BEGIN; update useraccount set name = '${name}', header = '${header}', bio='${bio}',location='${location}',website='${website}',birthdate= '${birthDate}' where id = ${req.user.user_id}; UPDATE dobvisiblity SET monthdayvisiblity = '${monthDayVisibility}',yearvisiblity='${yearVisibility}' where userid = ${req.user.user_id};commit;`,
       // "BEGIN; update useraccount set header = $1,bio=$2,location=$3,website=$4,birthdate=$5 where id = $6; UPDATE dobvisiblity SET monthdayvisiblity = $7,yearvisiblity=$8 where userid = $9;commit;",
       // [
       // header,
@@ -264,7 +430,7 @@ const update_profile_content = async (req, res) => {
       }
     );
   } catch (err) {
-    res.status(400).json({ status: false, message: err });
+    res.status(400).json({ status: false, message: err, console: "outside" });
   }
 };
 
@@ -313,6 +479,7 @@ const remove_header_pic = async (req, res) => {
 };
 
 const remove_dob = (req, res) => {
+  // console.log("hi");
   try {
     database.query(
       "update UserAccount set birthdate=$1 where id = $2",
@@ -334,6 +501,7 @@ const remove_dob = (req, res) => {
 module.exports = {
   userProfile,
   friendProfile,
+  friendYearVisibility,
   remove_profile_pic,
   remove_header_pic,
   remove_dob,

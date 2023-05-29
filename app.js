@@ -9,7 +9,7 @@ const limiter = ratelimit({
 let cors = require("cors");
 require("dotenv").config();
 const { PORT } = process.env;
-const port = 8080 || PORT;
+const port = PORT;
 const auth = require("./Routes/Auth");
 const analytics = require("./Routes/TweetAnalytics");
 const messages = require("./Routes/Messages");
@@ -24,6 +24,16 @@ const bodyParser = require("body-parser");
 const twittercircle = require("./Routes/TwitterCircle");
 const friendSuggestions = require("./Routes/friendsuggestions");
 
+// app.use((req, res, next) => {
+//   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3001");
+//   res.setHeader(
+//     "Access-Control-Allow-Methods",
+//     "GET, POST, PATCH, PUT, DELETE"
+//   );
+//   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//   next();
+// });
+// console.log(PORT);
 app.use(
   // limiter,
   cors(),

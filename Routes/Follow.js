@@ -20,7 +20,7 @@ router.get(
 );
 router.get("/followingcount", AuthenticateToken, followingcount);
 // router.get("/followercountrename", AuthenticateToken, followercountrename);
-router.post("/addfollower", AuthenticateToken, addfollower);
-router.delete("/unfollow", AuthenticateToken, unfollow);
+router.get("/addFollower/:id", AuthenticateToken, addfollower);
+router.delete("/unFollow/:id", AuthenticateToken, unfollow);
 
 module.exports = router;

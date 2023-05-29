@@ -34,28 +34,33 @@ const search =
   (bodyParser,
   async (req, res) => {
     try {
+      console.log("jo");
       // const term = req.body.searchterm;
       // const value = req.body.value;
       const username = req.body.name.toLowerCase();
-      const response = await elasticClient.search({
-        timeout: "2s",
-        index: "user",
-        body: {
-          query: {
-            prefix: {
-              name: username,
+      if (username) {
+        const response = await elasticClient.search({
+          timeout: "2s",
+          index: "user",
+          body: {
+            query: {
+              prefix: {
+                name: username,
+              },
+              // terms: {
+              //   username: letters,
+              //   boost: 1.0,
+              // },
+              // match: {
+              //   username: username,
+              // },
             },
-            // terms: {
-            //   username: letters,
-            //   boost: 1.0,
-            // },
-            // match: {
-            //   username: username,
-            // },
           },
-        },
-      });
-      res.status(200).json({ status: true, data: response.hits.hits });
+        });
+        res.status(200).json({ status: true, data: response.hits.hits });
+      } else {
+        res.status(200).json({ status: true, data: [] });
+      }
       // The response variable now contains the search results
 
       // let query = { index: "tweets" };

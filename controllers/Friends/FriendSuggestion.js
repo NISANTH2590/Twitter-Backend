@@ -7,7 +7,7 @@ const showfriends = (req, res) => {
     offset = req.body.offset;
     if (!limit) limit = 3;
     if (!offset) offset = 0;
-    offset = limit * offset;
+    // offset = limit * offset;
     database.query(
       "SELECT id, name, username, profilepicture_url, bio, verified FROM UserAccount WHERE id!=$1 AND id NOT IN (SELECT followerid FROM follow where followingid = $2 UNION SELECT followingid FROM follow where followerid = $3)limit  $4 offset $5 ",
       [req.user.user_id, req.user.user_id, req.user.user_id, limit, offset],

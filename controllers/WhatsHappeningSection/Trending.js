@@ -1,22 +1,23 @@
 const database = require("../../db.config");
 
 const trendinghashtags = (req, res) => {
+  console.log("hi");
   try {
     let limit, offset;
     limit = req.body.limit;
     offset = req.body.offset;
-    if (!limit) limit = 5;
+    if (!limit) limit = 4;
     if (!offset) offset = 0;
     offset = limit * offset;
     database.query(
-      "select hashtags,hashtagcount from hashtags order by hashtagcount DESC limit  $1 offset $2 ",
+      "select * from hashtags order by hashtagcount DESC limit  $1 offset $2 ",
       [limit, offset],
       (err, results) => {
         if (err) res.status(400).json({ status: false, message: err });
         else {
-          if (results)
+          if (results) {
             res.status(200).json({ status: true, data: results.rows });
-          else
+          } else
             res
               .status(200)
               .json({ status: false, message: "HashTags not Displayed." });
@@ -28,25 +29,28 @@ const trendinghashtags = (req, res) => {
   }
 };
 
-// ITs only for music !!
-
-// const trendinghashtags_trending= (req, res) => {
-//   let limit, offset;
-//   limit = req.body.limit;
-//   offset = req.body.offset;
-//   if (!limit) limit = 10;
-//   if (!offset) offset = 0;
-//   offset = limit * offset;
-//   database.query(
-//     "select hashtags,hashtagcount from hashtags order by hashtagcount DESC limit  $1 offset $2 where category = music",
-//     [limit, offset],
-//     (err, results) => {
-//       if (err) throw err;
-//       if (results) res.status(200).json(results.rows);
-//       else res.status(400).json("HashTags not Displayed.");
-//     }
-//   );
-// };
+const trendingSection = (req, res) => {
+  let limit, offset;
+  limit = req.body.limit;
+  offset = req.body.offset;
+  if (!limit) limit = 10;
+  if (!offset) offset = 0;
+  offset = limit * offset;
+  database.query(
+    `SELECT *
+    FROM hashtags
+    WHERE category = 'trendinginindia'
+    ORDER BY hashtagcount DESC
+    LIMIT $1
+    OFFSET $2;`,
+    [limit, offset],
+    (err, results) => {
+      if (err) res.status(400).json({ status: false, message: err });
+      if (results) res.status(200).json(results.rows);
+      else res.status(400).json("HashTags not Displayed.");
+    }
+  );
+};
 
 const trendinghashtags_entertainment = (req, res) => {
   try {
@@ -133,6 +137,7 @@ const trendinghashtags_sports = (req, res) => {
 };
 module.exports = {
   trendinghashtags,
+  trendingSection,
   trendinghashtags_entertainment,
   trendinghashtags_sports,
   trendinghashtags_news,

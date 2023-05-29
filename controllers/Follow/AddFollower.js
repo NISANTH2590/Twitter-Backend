@@ -2,9 +2,8 @@ const database = require("../../db.config");
 
 const addfollower = async (req, res) => {
   try {
-    const user = req.body.userid;
+    const user = req.params.id;
     const userid = req.user.user_id;
-    console.log(user);
     await database.query(
       "insert into follow (followerid,followingid) values ($1,$2) ",
       [userid, user],

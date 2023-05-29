@@ -7,24 +7,22 @@ const {
   //   trendinghashtags_music,
   trendinghashtags_entertainment,
   trendinghashtags_sports,
+  trendingSection,
   trendinghashtags_news,
 } = require("../controllers/WhatsHappeningSection/Trending");
 
-router.post("/trendinghashtags", AuthenticateToken, trendinghashtags);
+router.post("/trendingHashtags", AuthenticateToken, trendinghashtags);
 // router.post(
 //   "/trendinghashtags_music",
 //   AuthenticateToken,
 //   trendinghashtags_music
 // );
 router.post(
-  "/trendinghashtags_entertainment",
+  "/trending/entertainment",
   AuthenticateToken,
   trendinghashtags_entertainment
 );
-router.post(
-  "/trendinghashtags_sports",
-  AuthenticateToken,
-  trendinghashtags_sports
-);
-router.post("/trendinghashtags_news", AuthenticateToken, trendinghashtags_news);
+router.post("/trending", AuthenticateToken, trendingSection);
+router.post("/trending/sports", AuthenticateToken, trendinghashtags_sports);
+router.post("/trending/news", AuthenticateToken, trendinghashtags_news);
 module.exports = router;

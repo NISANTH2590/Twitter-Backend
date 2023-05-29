@@ -2,7 +2,7 @@ const database = require("../../db.config");
 
 const unfollow = async (req, res) => {
   try {
-    let user = req.body.userid;
+    let user = req.params.id;
 
     await database.query(
       "delete from follow where followingid=$1 AND followerid = $2",
