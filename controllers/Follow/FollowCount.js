@@ -28,6 +28,7 @@ const followcount = async (req, res) => {
 
 const followercount_recommended = async (req, res) => {
   try {
+    console.log("h");
     database.query(
       "select name,username,profilepicture_url,bio,verified,id from useraccount where id in (select followerid from follow where followingid = $1 AND followerid not in (select friendid from twittercircle where user_id=$2));",
       [req.user.user_id, req.user.user_id],

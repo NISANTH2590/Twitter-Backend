@@ -1,7 +1,7 @@
 const database = require("../../db.config");
 
 const trendinghashtags = (req, res) => {
-  console.log("hi");
+  // console.log("forYou");
   try {
     let limit, offset;
     limit = req.body.limit;
@@ -10,7 +10,7 @@ const trendinghashtags = (req, res) => {
     if (!offset) offset = 0;
     offset = limit * offset;
     database.query(
-      "select * from hashtags order by hashtagcount DESC limit  $1 offset $2 ",
+      "select hashtags,hashtagcount,category from hashtags order by hashtagcount DESC limit  $1 offset $2 ",
       [limit, offset],
       (err, results) => {
         if (err) res.status(400).json({ status: false, message: err });
@@ -30,6 +30,7 @@ const trendinghashtags = (req, res) => {
 };
 
 const trendingSection = (req, res) => {
+  // console.log("trending");
   let limit, offset;
   limit = req.body.limit;
   offset = req.body.offset;
@@ -37,7 +38,7 @@ const trendingSection = (req, res) => {
   if (!offset) offset = 0;
   offset = limit * offset;
   database.query(
-    `SELECT *
+    `SELECT hashtags,hashtagcount,category
     FROM hashtags
     WHERE category = 'trendinginindia'
     ORDER BY hashtagcount DESC
@@ -46,13 +47,15 @@ const trendingSection = (req, res) => {
     [limit, offset],
     (err, results) => {
       if (err) res.status(400).json({ status: false, message: err });
-      if (results) res.status(200).json(results.rows);
-      else res.status(400).json("HashTags not Displayed.");
+      if (results) {
+        res.status(200).json({ status: true, data: results.rows });
+      } else res.status(400).json("HashTags not Displayed.");
     }
   );
 };
 
 const trendinghashtags_entertainment = (req, res) => {
+  // console.log("entertainment");
   try {
     let limit, offset;
     limit = req.body.limit;
@@ -61,14 +64,15 @@ const trendinghashtags_entertainment = (req, res) => {
     if (!offset) offset = 0;
     offset = limit * offset;
     database.query(
-      "select hashtags,hashtagcount from hashtags where category = $1 order by hashtagcount DESC limit  $2 offset $3",
+      "select hashtags,hashtagcount,category from hashtags where category = $1 order by hashtagcount DESC limit  $2 offset $3",
       ["entertainment", limit, offset],
       (err, results) => {
         if (err) res.status(400).json({ status: false, message: err });
         else {
-          if (results)
+          if (results) {
+            console.log(limit, offset);
             res.status(200).json({ status: true, data: results.rows });
-          else
+          } else
             res
               .status(200)
               .json({ status: false, message: "HashTags not Displayed." });
@@ -81,6 +85,7 @@ const trendinghashtags_entertainment = (req, res) => {
 };
 
 const trendinghashtags_news = (req, res) => {
+  // console.log("news");
   try {
     let limit, offset;
     limit = req.body.limit;
@@ -89,7 +94,7 @@ const trendinghashtags_news = (req, res) => {
     if (!offset) offset = 0;
     offset = limit * offset;
     database.query(
-      "select hashtags,hashtagcount from hashtags where category = $1 order by hashtagcount DESC limit  $2 offset $3",
+      "select hashtags,hashtagcount,category from hashtags where category = $1 order by hashtagcount DESC limit  $2 offset $3",
       ["news", limit, offset],
       (err, results) => {
         if (err) res.status(400).json({ status: false, message: err });
@@ -109,6 +114,7 @@ const trendinghashtags_news = (req, res) => {
 };
 
 const trendinghashtags_sports = (req, res) => {
+  // console.log("sports");
   try {
     let limit, offset;
     limit = req.body.limit;
@@ -117,7 +123,7 @@ const trendinghashtags_sports = (req, res) => {
     if (!offset) offset = 0;
     offset = limit * offset;
     database.query(
-      "select hashtags,hashtagcount from hashtags where category = $1 order by hashtagcount DESC limit  $2 offset $3",
+      "select hashtags,hashtagcount,category from hashtags where category = $1 order by hashtagcount DESC limit  $2 offset $3",
       ["sports", limit, offset],
       (err, results) => {
         if (err) res.status(400).json({ status: false, message: err });

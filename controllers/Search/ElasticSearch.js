@@ -44,16 +44,24 @@ const search =
           index: "user",
           body: {
             query: {
-              prefix: {
-                name: username,
+              // wildcard: {
+              //   username: `*${username}*`,
+              // },
+              bool: {
+                should: [
+                  {
+                    wildcard: {
+                      username: `*${username}*`,
+                    },
+                  },
+                  {
+                    wildcard: {
+                      name: `*${username}*`,
+                    },
+                  },
+                ],
+                minimum_should_match: 1,
               },
-              // terms: {
-              //   username: letters,
-              //   boost: 1.0,
-              // },
-              // match: {
-              //   username: username,
-              // },
             },
           },
         });

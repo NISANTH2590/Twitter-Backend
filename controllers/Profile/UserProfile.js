@@ -139,7 +139,6 @@ const upload = (req, res) => {
 };
 
 const userProfile = async (req, res) => {
-  console.log("i");
   // res.send("hello");
   try {
     await database.query(
@@ -158,7 +157,6 @@ const userProfile = async (req, res) => {
 const friendProfile = async (req, res) => {
   try {
     let friendUserName = req.body.friendUserName;
-    console.log("ik", friendUserName);
     if (friendUserName) {
       await database.query(
         "SELECT ua.id FROM UserAccount ua WHERE ua.username = $1;",
@@ -167,102 +165,109 @@ const friendProfile = async (req, res) => {
           if (err) res.status(400).json({ status: false, message: err });
           else {
             let friendId = results.rows[0].id;
-            await database.query(
-              "SELECT ua.id,ua.name,ua.username,ua.profilepicture_url,ua.header,ua.bio,ua.website,ua.verified,ua.createdat,ua.gender,ua.location,ua.birthdate,(SELECT COUNT(userid) FROM tweets WHERE userid = $1) AS tweet_count,(SELECT COUNT(followingid) FROM follow WHERE followerid = $1) AS following_count,(SELECT COUNT(followerid) FROM follow WHERE followingid = $1) AS follower_count FROM UserAccount ua WHERE ua.id = $1;",
-              [friendId],
-              async (err, results) => {
-                if (err) res.status(400).json({ status: false, message: err });
-                else {
-                  let data = results.rows[0];
+            if (friendId)
+              await database.query(
+                "SELECT ua.id,ua.name,ua.username,ua.profilepicture_url,ua.header,ua.bio,ua.website,ua.verified,ua.createdat,ua.gender,ua.location,ua.birthdate,(SELECT COUNT(userid) FROM tweets WHERE userid = $1) AS tweet_count,(SELECT COUNT(followingid) FROM follow WHERE followerid = $1) AS following_count,(SELECT COUNT(followerid) FROM follow WHERE followingid = $1) AS follower_count FROM UserAccount ua WHERE ua.id = $1;",
+                [friendId],
+                async (err, results) => {
+                  if (err)
+                    res.status(400).json({ status: false, message: err });
+                  else {
+                    let data = results.rows[0];
 
-                  let visibilityDob = true;
-                  // console.log("sad1qqqq9rdywi3y");
-                  await database.query(
-                    `Select * from dobvisiblity where userid =${friendId}`,
-                    async (err, results) => {
-                      const { monthdayvisiblity, yearvisiblity } =
-                        results.rows[0];
-                      if (monthdayvisiblity == "yourfollowers") {
-                        // console.log("sad1qqqq");
-                        database.query(
-                          `select followerid from follow where followingid =${friendId} AND followerid = ${req.user.user_id}`,
-                          (err, results) => {
-                            if (!results.rows.length) {
-                              visibilityDob = false;
-                              res.status(200).json({
-                                status: true,
-                                data: data,
-                                visibility: visibilityDob,
-                              });
-                            } else {
-                              res.status(200).json({
-                                status: true,
-                                data: data,
-                                visibility: visibilityDob,
-                              });
+                    let visibilityDob = true;
+                    // console.log("sad1qqqq9rdywi3y");
+                    await database.query(
+                      `Select * from dobvisiblity where userid =${friendId}`,
+                      async (err, results) => {
+                        const { monthdayvisiblity, yearvisiblity } =
+                          results.rows[0];
+                        if (monthdayvisiblity == "yourfollowers") {
+                          // console.log("sad1qqqq");
+                          database.query(
+                            `select followerid from follow where followingid =${friendId} AND followerid = ${req.user.user_id}`,
+                            (err, results) => {
+                              if (!results.rows.length) {
+                                visibilityDob = false;
+                                res.status(200).json({
+                                  status: true,
+                                  data: data,
+                                  visibility: visibilityDob,
+                                });
+                              } else {
+                                res.status(200).json({
+                                  status: true,
+                                  data: data,
+                                  visibility: visibilityDob,
+                                });
+                              }
                             }
-                          }
-                        );
-                      } else if (monthdayvisiblity == "peopleyoufollow") {
-                        database.query(
-                          `select followingid from follow where followerid =${friendId} AND followingid = ${req.user.user_id}`,
-                          (err, results) => {
-                            if (!results.rows.length) {
-                              visibilityDob = false;
-                              res.status(200).json({
-                                status: true,
-                                data: data,
-                                visibility: visibilityDob,
-                              });
-                            } else {
-                              res.status(200).json({
-                                status: true,
-                                data: data,
-                                visibility: visibilityDob,
-                              });
+                          );
+                        } else if (monthdayvisiblity == "peopleyoufollow") {
+                          database.query(
+                            `select followingid from follow where followerid =${friendId} AND followingid = ${req.user.user_id}`,
+                            (err, results) => {
+                              if (!results.rows.length) {
+                                visibilityDob = false;
+                                res.status(200).json({
+                                  status: true,
+                                  data: data,
+                                  visibility: visibilityDob,
+                                });
+                              } else {
+                                res.status(200).json({
+                                  status: true,
+                                  data: data,
+                                  visibility: visibilityDob,
+                                });
+                              }
                             }
-                          }
-                        );
-                      } else if (monthdayvisiblity == "youfolloweachother") {
-                        database.query(
-                          `SELECT 1 FROM follow AS f1 WHERE f1.followerid = ${friendId} AND f1.followingid = ${req.user.user_id}AND EXISTS (SELECT 1 FROM follow AS f2 WHERE f2.followerid = ${req.user.user_id} AND f2.followingid = ${friendId});`,
-                          (err, results) => {
-                            if (!results.rows.length) {
-                              visibilityDob = false;
-                              res.status(200).json({
-                                status: true,
-                                data: data,
-                                visibility: visibilityDob,
-                              });
-                            } else {
-                              res.status(200).json({
-                                status: true,
-                                data: data,
-                                visibility: visibilityDob,
-                              });
+                          );
+                        } else if (monthdayvisiblity == "youfolloweachother") {
+                          database.query(
+                            `SELECT 1 FROM follow AS f1 WHERE f1.followerid = ${friendId} AND f1.followingid = ${req.user.user_id}AND EXISTS (SELECT 1 FROM follow AS f2 WHERE f2.followerid = ${req.user.user_id} AND f2.followingid = ${friendId});`,
+                            (err, results) => {
+                              if (!results.rows.length) {
+                                visibilityDob = false;
+                                res.status(200).json({
+                                  status: true,
+                                  data: data,
+                                  visibility: visibilityDob,
+                                });
+                              } else {
+                                res.status(200).json({
+                                  status: true,
+                                  data: data,
+                                  visibility: visibilityDob,
+                                });
+                              }
                             }
-                          }
-                        );
-                      } else if (monthdayvisiblity == "public") {
-                        res.status(200).json({
-                          status: true,
-                          data: data,
-                          visibility: true,
-                        });
-                      } else {
-                        res.status(200).json({
-                          status: true,
-                          data: data,
-                          visibility: false,
-                        });
+                          );
+                        } else if (monthdayvisiblity == "public") {
+                          res.status(200).json({
+                            status: true,
+                            data: data,
+                            visibility: true,
+                          });
+                        } else {
+                          res.status(200).json({
+                            status: true,
+                            data: data,
+                            visibility: false,
+                          });
+                        }
+                        // console.log("happkddwsnekny");
                       }
-                      // console.log("happkddwsnekny");
-                    }
-                  );
-                  // console.log("happy");
+                    );
+                    // console.log("happy");
+                  }
                 }
-              }
-            );
+              );
+            else {
+              res
+                .status(400)
+                .json({ status: false, message: "No FriendId Available" });
+            }
           }
         }
       );
